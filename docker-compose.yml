@@ -1,0 +1,27 @@
+pytacz-nginx:
+    image: nginx:latest
+    container_name: pytacz-nginx
+    ports:
+        - 80:80
+    volumes:
+        - ".:/var/www/html:rw"
+        - "./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro"
+    links:
+        - pytacz-php
+        - pytacz-pgsql
+pytacz-php:
+    build: docker/php/
+    container_name: pytacz-php
+    volumes:
+        - ".:/var/www/html:rw"
+    links:
+        - pytacz-pgsql
+pytacz-pgsql:
+    image: postgres:latest
+    container_name: pytacz-pgsql
+    ports:
+        - 5432:5432
+    environment:
+        - POSTGRES_DATABASE=pytacz
+        - POSTGRES_USER=pytacz
+        - POSTGRES_PASSWORD=pytacz
