@@ -2,13 +2,16 @@
 
 namespace ApiBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use FOS\RestBundle\Controller\Annotations as Rest;
 
-class DefaultController extends Controller
+class DefaultController
 {
+    /**
+     * @Rest\View
+     */
     public function indexAction()
     {
-        return new JsonResponse(['status' => 'ok']);
+        $data = ['test' => 'ok'];
+        return $data;
     }
 }
