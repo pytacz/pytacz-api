@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class UsersControllerTest extends WebTestCase
 {
-    public function testPostUsersAction()
+    public function testPostUsersActionSuccess()
     {
         $client = $this->createClient();
         $client->request('POST', '/users', [
@@ -21,5 +21,17 @@ class UsersControllerTest extends WebTestCase
         ]);
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($data['success']);
+    }
+
+    public function testPostUsersActionFail()
+    {
+        $client = $this->createClient();
+        $client->request('POST', '/users');
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertFalse($data['success']);
+        $this->assertSame(
+            'Formularz nie został przesłany prawidłowo',
+            $data['errors']['request']
+        );
     }
 }

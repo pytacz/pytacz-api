@@ -29,6 +29,9 @@ class UsersController extends FOSRestController
         }
 
         $errors = $this->get('api.form_errors')->getAll($form);
+        if (empty($errors)) {
+            $errors['request'] = 'Formularz nie został przesłany prawidłowo';
+        }
         return [
             'success' => false,
             'errors' => $errors
