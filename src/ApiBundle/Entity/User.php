@@ -395,7 +395,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function unserialize($serialized)
     {
-        list (
+        list(
             $this->id,
             $this->username,
             $this->password,
@@ -405,4 +405,3 @@ class User implements AdvancedUserInterface, \Serializable
             ) = unserialize($serialized);
     }
 }
-
