@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 /**
- * Users
+ * User
  *
  * @ORM\Table(name="users")
  * @ORM\Entity(repositoryClass="ApiBundle\Repository\UserRepository")
@@ -67,7 +67,7 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * @var string
      *
-     * @ORM\Column(name="last_ip", type="string", length=15)
+     * @ORM\Column(name="last_ip", type="string", length=15, nullable=true)
      */
     private $lastIp;
 
@@ -88,7 +88,7 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * @var string
      *
-     * @ORM\Column(name="register_hash", type="string", length=30, nullable=true)
+     * @ORM\Column(name="register_hash", type="string", length=30, nullable=true, unique=true)
      */
     private $registerHash;
 
@@ -108,7 +108,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @param string $username
      *
-     * @return Users
+     * @return User
      */
     public function setUsername($username)
     {
@@ -132,7 +132,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @param string $email
      *
-     * @return Users
+     * @return User
      */
     public function setEmail($email)
     {
@@ -156,7 +156,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @param string $password
      *
-     * @return Users
+     * @return User
      */
     public function setPassword($password)
     {
@@ -180,7 +180,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @param \DateTime $registerDate
      *
-     * @return Users
+     * @return User
      */
     public function setRegisterDate($registerDate)
     {
@@ -204,7 +204,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @param boolean $isActive
      *
-     * @return Users
+     * @return User
      */
     public function setIsActive($isActive)
     {
@@ -228,7 +228,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @param \DateTime $lastDate
      *
-     * @return Users
+     * @return User
      */
     public function setLastDate($lastDate)
     {
@@ -252,7 +252,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @param string $lastIp
      *
-     * @return Users
+     * @return User
      */
     public function setLastIp($lastIp)
     {
@@ -276,7 +276,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @param string $registerIp
      *
-     * @return Users
+     * @return User
      */
     public function setRegisterIp($registerIp)
     {
@@ -300,7 +300,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @param string $name
      *
-     * @return Users
+     * @return User
      */
     public function setName($name)
     {
@@ -324,7 +324,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @param string $registerHash
      *
-     * @return Users
+     * @return User
      */
     public function setRegisterHash($registerHash)
     {
@@ -390,7 +390,9 @@ class User implements AdvancedUserInterface, \Serializable
         ));
     }
 
-    /** @see \Serializable::unserialize() */
+    /** @see \Serializable::unserialize()
+     * @param string $serialized
+     */
     public function unserialize($serialized)
     {
         list (

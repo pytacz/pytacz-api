@@ -1,0 +1,33 @@
+ApiBundle\Entity\User:
+    properties:
+        username:
+            - NotBlank:
+                message: 'Nie podano nazwy użytkownika'
+            - Regex:
+                pattern: '/[a-z0-9\-\_]/'
+                message: 'Nazwa użytkownika zawiera nieprawidłowe znaki'
+            - Length:
+                min: 5
+                minMessage: 'Nazwa użytkownika musi mieć minimum {{ limit }} znaki'
+                max: 20
+                maxMessage: 'Nazwa użytkownika musi mieć maksymalnie {{ limit }} znaków'
+        email:
+            - NotBlank:
+                message: 'Nie podano e-maila'
+            - Email:
+                message: 'Niepoprawny e-mail'
+                checkMX: true
+                checkHost: true
+        password:
+            - NotBlank:
+                message: 'Nie podano hasła'
+            - Length:
+                min: 8
+                minMessage: 'Hasło musi zawierać przynajmniej {{ limit }} znaków'
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+            fields: username
+            message: 'Ta nazwa użytkownika jest już zajęta'
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+            fields: email
+            message: 'Ten e-mail jest już zajęty'
