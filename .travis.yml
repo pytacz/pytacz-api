@@ -6,7 +6,7 @@ services:
   - postgresql
 
 addons:
-  postgresql: "9.6"
+  postgresql: 9.1
 
 php:
   - 7.0
