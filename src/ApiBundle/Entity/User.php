@@ -2,6 +2,7 @@
 
 namespace ApiBundle\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
@@ -44,7 +45,7 @@ class User implements AdvancedUserInterface, \Serializable
     private $password;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(name="register_date", type="datetime")
      */
@@ -58,7 +59,7 @@ class User implements AdvancedUserInterface, \Serializable
     private $isActive;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(name="last_date", type="datetime", nullable=true)
      */
@@ -98,7 +99,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -110,7 +111,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return User
      */
-    public function setUsername($username)
+    public function setUsername(string $username): User
     {
         $this->username = $username;
 
@@ -122,7 +123,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return string
      */
-    public function getUsername()
+    public function getUsername(): ?string
     {
         return $this->username;
     }
@@ -134,7 +135,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return User
      */
-    public function setEmail($email)
+    public function setEmail(string $email): User
     {
         $this->email = $email;
 
@@ -146,7 +147,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return string
      */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -158,7 +159,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return User
      */
-    public function setPassword($password)
+    public function setPassword(string $password): User
     {
         $this->password = $password;
 
@@ -170,7 +171,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return string
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -178,11 +179,11 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * Set registerDate
      *
-     * @param \DateTime $registerDate
+     * @param DateTime $registerDate
      *
      * @return User
      */
-    public function setRegisterDate($registerDate)
+    public function setRegisterDate(DateTime $registerDate): User
     {
         $this->registerDate = $registerDate;
 
@@ -192,9 +193,9 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * Get registerDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getRegisterDate()
+    public function getRegisterDate(): DateTime
     {
         return $this->registerDate;
     }
@@ -206,7 +207,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return User
      */
-    public function setIsActive($isActive)
+    public function setIsActive(bool $isActive): User
     {
         $this->isActive = $isActive;
 
@@ -218,7 +219,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return bool
      */
-    public function getIsActive()
+    public function getIsActive(): bool
     {
         return $this->isActive;
     }
@@ -226,11 +227,11 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * Set lastDate
      *
-     * @param \DateTime $lastDate
+     * @param DateTime $lastDate
      *
      * @return User
      */
-    public function setLastDate($lastDate)
+    public function setLastDate(DateTime $lastDate): User
     {
         $this->lastDate = $lastDate;
 
@@ -240,9 +241,9 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * Get lastDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getLastDate()
+    public function getLastDate(): DateTime
     {
         return $this->lastDate;
     }
@@ -254,7 +255,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return User
      */
-    public function setLastIp($lastIp)
+    public function setLastIp(string $lastIp): User
     {
         $this->lastIp = $lastIp;
 
@@ -266,7 +267,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return string
      */
-    public function getLastIp()
+    public function getLastIp(): string
     {
         return $this->lastIp;
     }
@@ -278,7 +279,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return User
      */
-    public function setRegisterIp($registerIp)
+    public function setRegisterIp(string $registerIp): User
     {
         $this->registerIp = $registerIp;
 
@@ -290,7 +291,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return string
      */
-    public function getRegisterIp()
+    public function getRegisterIp(): string
     {
         return $this->registerIp;
     }
@@ -302,7 +303,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return User
      */
-    public function setName($name)
+    public function setName(string $name): User
     {
         $this->name = $name;
 
@@ -314,7 +315,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -326,7 +327,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return User
      */
-    public function setRegisterHash($registerHash)
+    public function setRegisterHash(?string $registerHash): User
     {
         $this->registerHash = $registerHash;
 
@@ -338,34 +339,34 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return string
      */
-    public function getRegisterHash()
+    public function getRegisterHash(): string
     {
         return $this->registerHash;
     }
 
-    public function isAccountNonExpired()
+    public function isAccountNonExpired(): bool
     {
         return true;
     }
 
-    public function isAccountNonLocked()
+    public function isAccountNonLocked(): bool
     {
         return true;
     }
 
-    public function isCredentialsNonExpired()
+    public function isCredentialsNonExpired(): bool
     {
         return true;
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->isActive;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
-        return array('ROLE_USER');
+        return ['ROLE_USER'];
     }
 
     public function eraseCredentials()

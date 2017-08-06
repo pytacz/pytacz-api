@@ -2,6 +2,7 @@
 
 namespace ApiBundle\Controller;
 
+use ApiBundle\Entity\User;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -12,12 +13,13 @@ class UsersController extends FOSRestController
         $data = $this->get('api.registration')->registerUser($request);
 
         if ($data['success']) {
+            /** @var User $user */
             $user = $data['user'];
             $this->get('api.email')->sendEmail(
-                'Potwierdzenie rejestracji | pytacz.pl',    // subject
-                'registrationConfirmation',                 // template name
-                $user->getEmail(),                          // recipient
-                [                                           // parameters
+                'Potwierdzenie rejestracji | pytacz.pl',
+                'registrationConfirmation',
+                $user->getEmail(),
+                [
                     'hash' => $user->getRegisterHash(),
                     'username' => $user->getUsername()
                 ]
@@ -35,7 +37,7 @@ class UsersController extends FOSRestController
         }
     }
 
-    public function patchUsersActivateAction($slug)
+    public function patchUsersActivateAction(string $slug): array
     {
         return $this->get('api.registration')->activateUser($slug);
     }

@@ -27,6 +27,7 @@ class UsersControllerTest extends WebTestCase
         $this->assertEquals(1, $mailCollector->getMessageCount());
 
         $collectedMessages = $mailCollector->getMessages();
+        /** @var \Swift_Message $message */
         $message = $collectedMessages[0];
 
         $this->assertInstanceOf('Swift_Message', $message);

@@ -2,13 +2,17 @@
 
 namespace ApiBundle\User;
 
+use Swift_Mailer;
+use Swift_Message;
+use Twig_Environment;
+
 class EmailManager
 {
     private $mailer;
     private $twig;
     private $mailerUser;
 
-    public function __construct(\Swift_Mailer $mailer, \Twig_Environment $twig, $mailerUser)
+    public function __construct(Swift_Mailer $mailer, Twig_Environment $twig, string $mailerUser)
     {
         $this->mailer = $mailer;
         $this->twig = $twig;
@@ -25,10 +29,10 @@ class EmailManager
      *
      * @return  boolean                 send status
      */
-    public function sendEmail($subject, $template, $recipient, $parameters = null)
+    public function sendEmail(string $subject, string $template, string $recipient, array $parameters = null): bool
     {
         try {
-            $message = \Swift_Message::newInstance()
+            $message = Swift_Message::newInstance()
                 ->setSubject($subject)
                 ->setFrom($this->mailerUser)
                 ->setTo($recipient)

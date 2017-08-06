@@ -4,23 +4,33 @@ namespace ApiBundle\User;
 
 use ApiBundle\Entity\User;
 use ApiBundle\Form\RegisterType;
+use DateTime;
+use Doctrine\ORM\EntityManager;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 class Register
 {
+    /** @var EntityManager $em */
     private $em;
-    private $formFactory;
+    /** @var UserPasswordEncoder $passwordEncoder */
     private $passwordEncoder;
+    /** @var FormFactory $formFactory */
+    private $formFactory;
 
-    public function __construct($em, $formFactory, $passwordEncoder)
+    public function __construct(EntityManager $em, $formFactory, $passwordEncoder)
     {
         $this->em = $em;
         $this->formFactory = $formFactory;
         $this->passwordEncoder = $passwordEncoder;
     }
 
-    public function registerUser($request)
+    public function registerUser(Request $request): array
     {
         $user = new User();
+        /** @var Form $form */
         $form = $this->formFactory->create(RegisterType::class, $user);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -28,7 +38,7 @@ class Register
             $user->setPassword($password);
             $user->setIsActive(false);
             $user->setRegisterIp($request->getClientIp());
-            $user->setRegisterDate(new \DateTime());
+            $user->setRegisterDate(new DateTime());
             $user->setRegisterHash(bin2hex(random_bytes(15)));
 
             $this->em->persist($user);
@@ -40,7 +50,7 @@ class Register
         return ['form' => $form, 'success' => false];
     }
 
-    public function activateUser($slug)
+    public function activateUser(string $slug): array
     {
         $repository = $this->em->getRepository(User::class);
 
