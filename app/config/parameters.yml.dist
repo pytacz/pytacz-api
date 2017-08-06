@@ -2,18 +2,19 @@
 # Set parameters here that may be different on each deployment target of the app, e.g. development, staging, production.
 # https://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
 parameters:
-    database_host: pytacz-pgsql
+    database_host: pytaczapi-pgsql
     database_port: ~
-    database_name: pytacz
-    database_user: pytacz
-    database_password: pytacz
+    database_name: pytaczapi
+    database_user: pytaczapi
+    database_password: pytaczapi
     # You should uncomment this if you want to use pdo_sqlite
     #database_path: '%kernel.project_dir%/var/data/data.sqlite'
 
     mailer_transport: smtp
     mailer_host: 127.0.0.1
-    mailer_user: ~
+    mailer_user: no-reply@pytacz.local
     mailer_password: ~
+    mailer_port: ~
 
     # A secret key that's used to generate certain security-related tokens
     secret: ThisTokenIsNotSoSecretChangeIt
