@@ -9,7 +9,6 @@ addons:
   postgresql: 9.1
 
 php:
-  - 7.0
   - 7.1
 
 install:
