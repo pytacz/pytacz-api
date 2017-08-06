@@ -38,7 +38,7 @@ class EmailManager
                 ->setTo($recipient)
                 ->setBody($this->twig->render('ApiBundle:emails:' . $template . '.html.twig', [
                     'parameters' => $parameters
-                ]));
+                ]), 'text/html');
 
             $response = $this->mailer->send($message);
         } catch (\Exception $e) {

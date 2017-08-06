@@ -62,6 +62,7 @@ class Register
 
         $user->setRegisterHash(null);
         $user->setIsActive(true);
+        $this->em->flush($user);
 
         return ['success' => true];
     }
