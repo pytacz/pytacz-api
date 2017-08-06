@@ -4,7 +4,7 @@ ApiBundle\Entity\User:
             - NotBlank:
                 message: 'Nie podano nazwy użytkownika'
             - Regex:
-                pattern: '/[a-z0-9\-\_]/'
+                pattern: '/^[a-z0-9\-\_]+$/'
                 message: 'Nazwa użytkownika zawiera nieprawidłowe znaki'
             - Length:
                 min: 5

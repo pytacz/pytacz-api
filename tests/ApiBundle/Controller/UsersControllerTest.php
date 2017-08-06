@@ -1,6 +1,6 @@
 <?php
 
-namespace ApiBundle\Tests\Controller;
+namespace Tests\ApiBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -9,6 +9,8 @@ class UsersControllerTest extends WebTestCase
     public function testPostUsersActionSuccess()
     {
         $client = $this->createClient();
+        $client->enableProfiler();
+
         $client->request('POST', '/users', [
             'register' => [
                 'username' => 'example',
@@ -19,6 +21,18 @@ class UsersControllerTest extends WebTestCase
                 ]
             ]
         ]);
+
+        $mailCollector = $client->getProfile()->getCollector('swiftmailer');
+
+        $this->assertEquals(1, $mailCollector->getMessageCount());
+
+        $collectedMessages = $mailCollector->getMessages();
+        $message = $collectedMessages[0];
+
+        $this->assertInstanceOf('Swift_Message', $message);
+        $this->assertEquals('Potwierdzenie rejestracji | pytacz.pl', $message->getSubject());
+        $this->assertEquals($client->getKernel()->getContainer()->getParameter('mailer_user'), key($message->getFrom()));
+
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertTrue($data['success']);
     }

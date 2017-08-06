@@ -1,6 +1,6 @@
 <?php
 
-namespace ApiBundle\Service;
+namespace ApiBundle\Utils;
 
 use Symfony\Component\Form\Form;
 

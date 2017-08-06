@@ -1,3 +1,9 @@
 services:
     api.form_errors:
-        class: ApiBundle\Service\FormErrors
+        class: ApiBundle\Utils\FormErrors
+    api.email:
+        class: ApiBundle\User\EmailManager
+        arguments: ['@mailer', '@twig', %mailer_user%]
+    api.registration:
+        class: ApiBundle\User\Register
+        arguments: ['@doctrine.orm.entity_manager', '@form.factory', '@security.password_encoder']
