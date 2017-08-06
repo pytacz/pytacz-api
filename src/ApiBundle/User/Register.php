@@ -56,4 +56,3 @@ class Register
         return ['success' => true];
     }
 }
-
