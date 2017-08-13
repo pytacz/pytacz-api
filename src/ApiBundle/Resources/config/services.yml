@@ -7,3 +7,6 @@ services:
     api.registration:
         class: ApiBundle\User\Register
         arguments: ['@doctrine.orm.entity_manager', '@form.factory', '@security.password_encoder']
+    api.security.login_form_authenticator:
+        class: ApiBundle\Security\LoginFormAuthenticator
+        autowire: true
