@@ -45,7 +45,7 @@ class LoginFormAuthenticator extends AbstractGuardAuthenticator
             '_password' => $request->request->get('_password'),
         ];
 
-        $request->getSession()->set(Security::LAST_USERNAME,  $data['_username']);
+        $request->getSession()->set(Security::LAST_USERNAME, $data['_username']);
 
         return $data;
     }
@@ -77,7 +77,7 @@ class LoginFormAuthenticator extends AbstractGuardAuthenticator
         $bool = $encoder->isPasswordValid($user->getPassword(), $password, $user->getSalt());
 
         if ($bool) {
-            $user->setApiToken(substr(bin2hex(random_bytes(20)),0,20));
+            $user->setApiToken(substr(bin2hex(random_bytes(20)), 0, 20));
             $this->em->flush($user);
             return true;
         }
