@@ -17,6 +17,7 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new ApiBundle\ApiBundle(),
             new FOS\RestBundle\FOSRestBundle(),
+            new Lexik\Bundle\JWTAuthenticationBundle\LexikJWTAuthenticationBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {
@@ -30,6 +31,8 @@ class AppKernel extends Kernel
             }
             if ('test' === $this->getEnvironment()) {
                 $bundles[] = new DAMA\DoctrineTestBundle\DAMADoctrineTestBundle();
+                $bundles[] = new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle();
+                $bundles[] = new Liip\FunctionalTestBundle\LiipFunctionalTestBundle();
             }
         }
 

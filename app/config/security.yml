@@ -13,18 +13,28 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        secured_area:
-            anonymous: ~
-            http_basic: ~
-            remember_me:
-                secret: '%secret%'
-                secure: true
-            logout:
-                path: /logout
+        login:
+            pattern:  ^/login
+            stateless: true
+            anonymous: true
+            form_login:
+                check_path:               /login
+                require_previous_session: false
             guard:
                 authenticators:
                     - api.security.login_form_authenticator
 
+        api:
+            pattern:   ^/(?!users).*
+            stateless: true
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
+
     encoders:
         ApiBundle\Entity\User:
             algorithm: bcrypt
+
+    access_control:
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/,      roles: IS_AUTHENTICATED_FULLY }

@@ -94,13 +94,6 @@ class User implements AdvancedUserInterface, \Serializable
     private $registerHash;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="api_token", type="string", length=20, nullable=true, unique=true)
-     */
-    private $apiToken;
-
-    /**
      * Get id
      *
      * @return int
@@ -249,7 +242,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return DateTime
      */
-    public function getLastDate(): DateTime
+    public function getLastDate(): ?DateTime
     {
         return $this->lastDate;
     }
@@ -273,7 +266,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return string
      */
-    public function getLastIp(): string
+    public function getLastIp(): ?string
     {
         return $this->lastIp;
     }
@@ -348,30 +341,6 @@ class User implements AdvancedUserInterface, \Serializable
     public function getRegisterHash(): ?string
     {
         return $this->registerHash;
-    }
-
-    /**
-     * Get apiToken
-     *
-     * @return string
-     */
-    public function getApiToken(): ?string
-    {
-        return $this->apiToken;
-    }
-
-    /**
-     * Set apiToken
-     *
-     * @param string $apiToken
-     *
-     * @return User
-     */
-    public function setApiToken(string $apiToken): User
-    {
-        $this->apiToken = $apiToken;
-
-        return $this;
     }
 
     public function isAccountNonExpired(): bool

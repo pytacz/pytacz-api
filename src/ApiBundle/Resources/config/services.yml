@@ -10,3 +10,8 @@ services:
     api.security.login_form_authenticator:
         class: ApiBundle\Security\LoginFormAuthenticator
         autowire: true
+    api.authentication_listener:
+        class: ApiBundle\EventListeners\AuthenticationListener
+        autowire: true
+        tags:
+          - { name: kernel.event_listener, event: security.authentication.success, method: onAuthenticationSuccess }

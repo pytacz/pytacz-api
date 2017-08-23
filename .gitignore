@@ -15,5 +15,7 @@
 !var/SymfonyRequirements.php
 /vendor/
 /web/bundles/
+!var/jwt/private-test.pem
+!var/jwt/public-test.pem
 .idea/
 composer.lock

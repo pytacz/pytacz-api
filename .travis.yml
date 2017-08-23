@@ -2,11 +2,16 @@ language: php
 
 sudo: false
 
-services:
-  - postgresql
-
-addons:
-  postgresql: 9.1
+env:
+  global:
+    - setup=basic
+    - APP_ENV=staging
+    - APP_DEBUG=true
+    - APP_KEY=xxxx
+    - DB_CONNECTION=sqlite
+    - CACHE_DRIVER=file
+    - SESSION_DRIVER=file
+    - QUEUE_DRIVER=sync
 
 php:
   - 7.1
