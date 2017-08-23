@@ -109,7 +109,7 @@ class LoginFormAuthenticator extends AbstractGuardAuthenticator
     {
         $rememberMe = $request->request->get('_remember_me');
 
-        if ($rememberMe) {
+        if (!$rememberMe) {
             $expTime = time() + 3600; // 1 hour expiration
         } else {
             $expTime = time() + 31556929; // 1 year expiration
