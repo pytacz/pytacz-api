@@ -4,8 +4,8 @@ security:
 
     # https://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
     providers:
-        in_memory:
-            memory: ~
+        users:
+            entity: { class: ApiBundle\Entity\User, property: username }
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
@@ -13,16 +13,28 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        main:
-            anonymous: ~
-            # activate different ways to authenticate
+        login:
+            pattern:  ^/login
+            stateless: true
+            anonymous: true
+            form_login:
+                check_path:               /login
+                require_previous_session: false
+            guard:
+                authenticators:
+                    - api.security.login_form_authenticator
 
-            # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
-            #http_basic: ~
-
-            # https://symfony.com/doc/current/security/form_login_setup.html
-            #form_login: ~
+        api:
+            pattern:   ^/(?!users).*
+            stateless: true
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
 
     encoders:
         ApiBundle\Entity\User:
             algorithm: bcrypt
+
+    access_control:
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/,      roles: IS_AUTHENTICATED_FULLY }

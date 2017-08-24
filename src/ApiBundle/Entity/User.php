@@ -93,7 +93,6 @@ class User implements AdvancedUserInterface, \Serializable
      */
     private $registerHash;
 
-
     /**
      * Get id
      *
@@ -243,7 +242,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return DateTime
      */
-    public function getLastDate(): DateTime
+    public function getLastDate(): ?DateTime
     {
         return $this->lastDate;
     }
@@ -267,7 +266,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return string
      */
-    public function getLastIp(): string
+    public function getLastIp(): ?string
     {
         return $this->lastIp;
     }
@@ -315,7 +314,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return string
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -339,7 +338,7 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @return string
      */
-    public function getRegisterHash(): string
+    public function getRegisterHash(): ?string
     {
         return $this->registerHash;
     }

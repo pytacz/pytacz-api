@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UsersController extends FOSRestController
 {
-    public function postUsersAction(Request $request)
+    public function postUsersAction(Request $request): array
     {
         $data = $this->get('api.registration')->registerUser($request);
 

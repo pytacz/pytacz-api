@@ -7,7 +7,6 @@ use ApiBundle\Entity\User;
 use ApiBundle\User\Register;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-use Symfony\Component\Form\FormFactory;
 
 class RegisterTest extends WebTestCase
 {
