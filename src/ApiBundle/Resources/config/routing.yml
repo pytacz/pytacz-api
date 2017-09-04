@@ -2,6 +2,9 @@ api_default:
     resource: ApiBundle:Users
     type: rest
 security_login:
-    path: /login
+    path: /auth/login
     defaults: { _controller: ApiBundle:Security:login }
     methods: [POST]
+refresh_token:
+    path: /auth/refresh
+    defaults: { _controller: ApiBundle:Security:refreshToken }

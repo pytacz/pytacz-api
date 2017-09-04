@@ -8,6 +8,22 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UsersController extends FOSRestController
 {
+    public function getAuthUserAction()
+    {
+        $user = $this->getUser();
+
+        if ($user) {
+            return [
+                'success' => true,
+                'data' => $user
+            ];
+        } else {
+            return [
+                'success' => false
+            ];
+        }
+    }
+
     public function postUsersAction(Request $request): array
     {
         $data = $this->get('api.registration')->registerUser($request);

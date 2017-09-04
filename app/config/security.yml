@@ -14,15 +14,19 @@ security:
             security: false
 
         login:
-            pattern:  ^/login
+            pattern:  ^/auth/login
             stateless: true
             anonymous: true
             form_login:
-                check_path:               /login
+                check_path:               /auth/login
+                success_handler:          lexik_jwt_authentication.handler.authentication_success
+                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
                 require_previous_session: false
-            guard:
-                authenticators:
-                    - api.security.login_form_authenticator
+
+        refresh:
+            pattern:  ^/auth/refresh
+            stateless: true
+            anonymous: true
 
         api:
             pattern:   ^/(?!users).*
@@ -36,5 +40,6 @@ security:
             algorithm: bcrypt
 
     access_control:
-        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/,      roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/auth/login,   roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/auth/refresh, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/,             roles: IS_AUTHENTICATED_FULLY }

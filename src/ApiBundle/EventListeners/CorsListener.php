@@ -41,7 +41,7 @@ class CorsListener
     {
         $response->headers->set('Access-Control-Allow-Origin', '*');
         $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Access-Control-Allow-Origin, Content-Type');
+        $response->headers->set('Access-Control-Allow-Headers', 'Access-Control-Allow-Origin, Authorization, Content-Type');
         return $response;
     }
 }
