@@ -121,4 +121,3 @@ class Notebook
         return $this->user;
     }
 }
-
