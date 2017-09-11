@@ -2,10 +2,47 @@
 
 namespace Tests\ApiBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Liip\FunctionalTestBundle\Test\WebTestCase;
 
 class UsersControllerTest extends WebTestCase
 {
+    /**
+     * Create a client with Authorization header
+     *
+     * @param string $username
+     * @param string $password
+     *
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
+    protected function createAuthenticatedClient($username = 'TestUser', $password = 'testpassword')
+    {
+        $this->loadFixtures([
+            'ApiBundle\DataFixtures\ORM\LoadUserData',
+        ]);
+
+        $client = static::makeClient();
+        $client->request('POST', '/auth/login', [
+            '_username' => $username,
+            '_password' => $password
+        ]);
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+
+        $client = static::makeClient();
+        $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
+
+        return $client;
+    }
+
+    public function testGetAuthUserAction()
+    {
+        $client = $this->createAuthenticatedClient();
+
+        $client->request('GET', '/auth/user');
+
+        $this->assertStatusCode(200, $client);
+    }
+
     public function testPostUsersActionSuccess()
     {
         $client = $this->createClient();
