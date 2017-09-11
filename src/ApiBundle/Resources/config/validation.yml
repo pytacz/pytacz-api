@@ -31,3 +31,17 @@ ApiBundle\Entity\User:
         - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
             fields: email
             message: 'Ten e-mail jest już zajęty'
+
+ApiBundle\Entity\Notebook:
+    properties:
+        name:
+            - NotBlank:
+                message: 'Nie podano nazwy'
+            - Length:
+                min: 5
+                minMessage: 'Nazwa musi zawierać minimum {{ limit }} znaków'
+                max: 50
+                maxMessage: 'Nazwa musi zawierać maksymalnie {{ limit }} znaków'
+        private:
+            - NotBlank:
+                message: 'Dostępność notatnika nie została wybrana'

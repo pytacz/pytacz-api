@@ -7,6 +7,9 @@ services:
     api.registration:
         class: ApiBundle\User\Register
         arguments: ['@doctrine.orm.entity_manager', '@form.factory', '@security.password_encoder']
+    api.notebook_manager:
+        class: ApiBundle\Notes\NotebookManager
+        autowire: true
     api.authentication_listener:
         class: ApiBundle\EventListeners\AuthenticationListener
         autowire: true

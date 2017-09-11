@@ -8,3 +8,6 @@ security_login:
 refresh_token:
     path: /auth/refresh
     defaults: { _controller: ApiBundle:Security:refreshToken }
+api_notebook:
+    resource: ApiBundle:Notebook
+    type: rest
