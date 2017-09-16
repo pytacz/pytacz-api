@@ -24,3 +24,8 @@ services:
     api.security.refresh_token:
         class: ApiBundle\Security\RefreshToken
         autowire: true
+    api.notebook_name_unique:
+        class: ApiBundle\Validator\Constraints\NotebookNameUniqueValidator
+        autowire: true
+        tags:
+            - { name: validator.constraint_validator }

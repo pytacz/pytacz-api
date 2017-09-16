@@ -37,11 +37,13 @@ ApiBundle\Entity\Notebook:
         name:
             - NotBlank:
                 message: 'Nie podano nazwy'
+            - Regex:
+                pattern: '/^[A-Za-z0-9\-\_ ]+$/'
+                message: 'Nazwa zawiera nieprawidłowe znaki'
             - Length:
                 min: 5
                 minMessage: 'Nazwa musi zawierać minimum {{ limit }} znaków'
                 max: 50
                 maxMessage: 'Nazwa musi zawierać maksymalnie {{ limit }} znaków'
-        private:
-            - NotBlank:
-                message: 'Dostępność notatnika nie została wybrana'
+            - ApiBundle\Validator\Constraints\NotebookNameUnique:
+                message: 'Notatnik o takiej nazwie jest już zajęty'

@@ -7,9 +7,9 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use ApiBundle\Entity\User;
+use ApiBundle\Entity\Notebook;
 
-class LoadUserData extends AbstractFixture implements FixtureInterface, ContainerAwareInterface
+class LoadNotebookData extends AbstractFixture implements FixtureInterface, ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
@@ -22,26 +22,27 @@ class LoadUserData extends AbstractFixture implements FixtureInterface, Containe
     }
 
     /**
-     * Load user into test database
+     * Load notebook into test database
      *
      * @param ObjectManager $manager
      *
-     * @return void
+     * @return Notebook
      */
     public function load(ObjectManager $manager)
     {
-        $user = new User();
-        $user->setUsername('TestUser');
-        $user->setEmail('test@foo.com');
-        $password = $this->container->get('security.password_encoder')->encodePassword($user, 'testpassword');
-        $user->setPassword($password);
-        $user->setIsActive(true);
-        $user->setRegisterIp('127.0.0.1');
-        $user->setRegisterDate(new \DateTime());
+        $notebook = new Notebook();
+        $notebook->setName('TestNotebook');
+        $notebook->setPrivate(true);
+        $notebook->setUser($this->getReference('user'));
 
-        $manager->persist($user);
+        $manager->persist($notebook);
         $manager->flush();
+    }
 
-        $this->addReference('user', $user);
+    public function getDependencies()
+    {
+        return [
+            LoadUserData::class,
+        ];
     }
 }
