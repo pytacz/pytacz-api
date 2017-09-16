@@ -89,6 +89,4 @@ class Note
     {
         return $this->notebook;
     }
-
 }
-

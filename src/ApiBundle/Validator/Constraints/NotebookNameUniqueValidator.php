@@ -14,7 +14,8 @@ class NotebookNameUniqueValidator extends ConstraintValidator
     /** @var TokenStorage $tokenStorage */
     private $tokenStorage;
 
-    public function __construct(EntityManager $em, TokenStorage $tokenStorage) {
+    public function __construct(EntityManager $em, TokenStorage $tokenStorage)
+    {
         $this->em = $em;
         $this->tokenStorage = $tokenStorage;
     }
