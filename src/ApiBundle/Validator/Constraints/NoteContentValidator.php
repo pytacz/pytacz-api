@@ -7,7 +7,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class NoteContentValidator extends ConstraintValidator
 {
-    private function arrayDepth(array $array) {
+    private function arrayDepth(array $array)
+    {
         $maxDepth = 1;
 
         foreach ($array as $value) {
