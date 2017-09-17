@@ -10,6 +10,9 @@ services:
     api.notebook_manager:
         class: ApiBundle\Notes\NotebookManager
         autowire: true
+    api.note_manager:
+        class: ApiBundle\Notes\NoteManager
+        autowire: true
     api.authentication_listener:
         class: ApiBundle\EventListeners\AuthenticationListener
         autowire: true

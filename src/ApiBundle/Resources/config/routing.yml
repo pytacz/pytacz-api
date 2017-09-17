@@ -11,3 +11,6 @@ refresh_token:
 api_notebook:
     resource: ApiBundle:Notebook
     type: rest
+api_note:
+    resource: ApiBundle:Note
+    type: rest

@@ -27,12 +27,6 @@ class NotebookManager
         $this->tokenStorage = $tokenStorage;
     }
 
-    public function isBoolean(string $string)
-    {
-        $string = strtolower($string);
-        return in_array($string, ['true', 'false', '0', '1']);
-    }
-
     /**
      * Create notebook for logged user
      *

@@ -47,3 +47,23 @@ ApiBundle\Entity\Notebook:
                 maxMessage: 'Nazwa musi zawierać maksymalnie {{ limit }} znaków'
             - ApiBundle\Validator\Constraints\NotebookNameUnique:
                 message: 'Notatnik o takiej nazwie jest już zajęty'
+
+ApiBundle\Entity\Note:
+    properties:
+        content:
+            - NotBlank:
+                message: 'Nic nie zostało wysłane'
+            - ApiBundle\Validator\Constraints\NoteContent:
+                depth: 1
+                depthMessage: 'Każda notatka może mieć maksymalnie {{ limit }} warstwę subnotatek'
+                labelLengthMin: 2
+                labelLengthMinMessage: 'Nazwa notatki musi zawierać minimalnie {{ limit }} znaki'
+                labelLengthMax: 50
+                labelLengthMaxMessage: 'Nazwa notatki może zawierać maksymalnie {{ limit }} znaków'
+                contentLengthMin: 2
+                contentLengthMinMessage: 'Treść notatki musi zawierać minimalnie {{ limit }} znaki'
+                contentLengthMax: 1000
+                contentLengthMaxMessage: 'Treść notatki może zawierać maksymalnie {{ limit }} znaków'
+                regex: '/^[A-Za-z0-9\-\_\(\)\[\] ]+$/'
+                regexMessage: 'Pole zawiera niedozwolone znaki'
+                invalidDataMessage: 'Wystąpił błąd'
