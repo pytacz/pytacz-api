@@ -10,4 +10,15 @@ namespace ApiBundle\Repository;
  */
 class NoteRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function findNote($id)
+    {
+        $query = $this->getEntityManager()
+            ->createQuery(
+                'SELECT n.id, n.name, n.content, n.askable FROM ApiBundle:Note n
+            WHERE n.id = :id')
+            ->setParameters([
+                'id' => $id
+            ]);
+        return $query->getResult();
+    }
 }

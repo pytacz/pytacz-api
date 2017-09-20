@@ -50,20 +50,27 @@ ApiBundle\Entity\Notebook:
 
 ApiBundle\Entity\Note:
     properties:
+        name:
+            - Regex:
+                pattern: '/^[A-Za-z0-9\-\_\(\)\[\] ]+$/'
+                message: 'Nazwa notatki zawiera niedozwolone znaki'
+            - Length:
+                min: 2
+                minMessage: 'Nazwa musi mieć minimum {{ limit }} znaki'
+                max: 50
+                maxMessage: 'Nazwa może zawierać maksymalnie {{ limit }} znaków'
+ApiBundle\Entity\SubNote:
+    properties:
+        name:
+            - Regex:
+                pattern: '/^[A-Za-z0-9\-\_\(\)\[\] ]+$/'
+                message: 'Nazwa notatki zawiera niedozwolone znaki'
+            - Length:
+                min: 2
+                minMessage: 'Nazwa musi mieć minimum {{ limit }} znaki'
+                max: 50
+                maxMessage: 'Nazwa może zawierać maksymalnie {{ limit }} znaków'
         content:
-            - NotBlank:
-                message: 'Nic nie zostało wysłane'
-            - ApiBundle\Validator\Constraints\NoteContent:
-                depth: 1
-                depthMessage: 'Każda notatka może mieć maksymalnie {{ limit }} warstwę subnotatek'
-                labelLengthMin: 2
-                labelLengthMinMessage: 'Nazwa notatki musi zawierać minimalnie {{ limit }} znaki'
-                labelLengthMax: 50
-                labelLengthMaxMessage: 'Nazwa notatki może zawierać maksymalnie {{ limit }} znaków'
-                contentLengthMin: 2
-                contentLengthMinMessage: 'Treść notatki musi zawierać minimalnie {{ limit }} znaki'
-                contentLengthMax: 1000
-                contentLengthMaxMessage: 'Treść notatki może zawierać maksymalnie {{ limit }} znaków'
-                regex: '/^[A-Za-z0-9\-\_\(\)\[\] ]+$/'
-                regexMessage: 'Pole zawiera niedozwolone znaki'
-                invalidDataMessage: 'Wystąpił błąd'
+            - Length:
+                max: 1000
+                maxMessage: 'Treść może zawierać maksymalnie {{ limit }} znaków'

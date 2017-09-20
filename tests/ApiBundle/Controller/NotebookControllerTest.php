@@ -10,9 +10,12 @@ class NotebookControllerTest extends WebTestCase
 {
     protected function setUp()
     {
+        //load all 4 for testing cascade delete
         $this->loadFixtures([
             'ApiBundle\DataFixtures\ORM\LoadUserData',
             'ApiBundle\DataFixtures\ORM\LoadNotebookData',
+            'ApiBundle\DataFixtures\ORM\LoadNoteData',
+            'ApiBundle\DataFixtures\ORM\LoadSubNoteData',
         ]);
     }
 
@@ -128,9 +131,8 @@ class NotebookControllerTest extends WebTestCase
         /** @var Notebook $notebook */
         $notebook = $this->getFixtureNotebook();
 
-        $client->request('PATCH', '/notebooks', [
+        $client->request('PATCH', sprintf('/notebooks/%d', $notebook->getId()), [
             'notebook' => [
-                'id' => $notebook->getId(),
                 'private' => 'true'
             ]
         ]);
@@ -143,10 +145,10 @@ class NotebookControllerTest extends WebTestCase
     public function testPatchNotebooksActionFailure()
     {
         $client = $this->createAuthenticatedClient();
+        /** @var Notebook $notebook */
 
-        $client->request('PATCH', '/notebooks', [
+        $client->request('PATCH', sprintf('/notebooks/%d', 'wrong_id'), [
             'notebook' => [
-                'id' => 'wrong id',
                 'private' => 'true'
             ]
         ]);
@@ -167,17 +169,27 @@ class NotebookControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertStatusCode(200, $client);
         $this->assertTrue($data['success']);
+        $this->assertEquals($notebook->getId(), $data['notebook'][0]['id']);
     }
 
     public function testGetNotebookActionFailure()
     {
         $client = $this->createAuthenticatedClient();
 
-        $client->request('GET', sprintf('/notebooks/%s', 'wrong_id'));
+        $client->request('GET', sprintf('/notebooks/%s', 'wrong')); //not numeric
 
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertStatusCode(200, $client);
         $this->assertFalse($data['success']);
+    }
+
+    public function testGetNotebookActionFailure404()
+    {
+        $client = $this->createAuthenticatedClient();
+
+        $client->request('GET', sprintf('/notebooks/%d', 99999)); //definitely wrong
+
+        $this->assertStatusCode(404, $client);
     }
 
     public function testGetNotebooksActionSuccess()

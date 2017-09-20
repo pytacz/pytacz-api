@@ -41,24 +41,21 @@ class NotebookManager
         /** @var Form $form */
         $form = $this->formFactory->create(NotebookType::class, $notebook);
         $body = $request->request->get('notebook');
-        if (isset($body['name'])) {
-            $name = preg_replace('/\s+/', ' ', $body['name']);
-            $request->request->set('notebook', [
-                'name' => $name,
-                'private' => filter_var($body['private'], FILTER_VALIDATE_BOOLEAN)
-            ]);
+        if (isset($body['private']) && isset($body['name'])) {
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
+                $name = preg_replace('/\s+/', ' ', $body['name']);
+                $notebook->setName($name);
+                $notebook->setPrivate(filter_var($body['private'], FILTER_VALIDATE_BOOLEAN));
                 $notebook->setUser($user);
 
                 $this->em->persist($notebook);
                 $this->em->flush();
 
-                return ['success' => true];
+                return ['success' => true, 'id' => $notebook->getId()];
             }
         }
-
         return ['form' => $form, 'success' => false];
     }
 
@@ -71,16 +68,37 @@ class NotebookManager
      */
     public function getNotebook($id): array
     {
-        if (is_int((int)$id)) {
+        if (is_numeric($id)) {
+            /** @var Notebook $notebook */
             $notebook = $this->em->getRepository('ApiBundle:Notebook')
                 ->findOneBy(['id' => $id]);
 
             if ($notebook) {
-                return [
-                    'success' => true,
-                    'notebook' => $notebook
-                ];
+                $owner = $notebook->getUser()->getUsername();
+                if ($notebook->getPrivate() === true) {
+                    if ($notebook->getUser() === $this->tokenStorage->getToken()->getUser()) {
+                        /** @var Notebook $notebook */
+                        $notebook = $this->em->getRepository('ApiBundle:Notebook')
+                            ->getNotebook($notebook->getId());
+                        return [
+                            'success' => true,
+                            'notebook' => $notebook,
+                            'user' => $owner
+                        ];
+                    }
+                    return ['success' => false, 'code' => 403];
+                } else {
+                    /** @var Notebook $notebook */
+                    $notebook = $this->em->getRepository('ApiBundle:Notebook')
+                        ->getNotebook($notebook->getId());
+                    return [
+                        'success' => true,
+                        'notebook' => $notebook,
+                        'user' => $owner
+                    ];
+                }
             }
+            return ['success' => false, 'code' => 404];
         }
         return ['success' => false];
     }
@@ -96,7 +114,7 @@ class NotebookManager
     {
         $parameter = $request->query->get('username');
         $user = $this->em->getRepository('ApiBundle:User')
-            ->findOneByUsername($parameter);
+            ->findOneBy(['username' => $parameter]);
         /** @var User $loggedUser */
         $loggedUser = $this->tokenStorage->getToken()->getUser();
 
@@ -123,45 +141,50 @@ class NotebookManager
     /**
      * Update fields of notebook
      *
-     * @param Request $request
+     * @param Request   $request
+     * @param int       $id
      *
      * @return array
      */
-    public function patchNotebook(Request $request): array
+    public function patchNotebook(Request $request, $id): array
     {
-        try {
-            $user = $this->tokenStorage->getToken()->getUser();
-            $body = $request->get('notebook');
+        if (is_numeric($id)) {
             $notebook = $this->em->getRepository('ApiBundle:Notebook')
-                ->findOneBy(['id' => $body['id'], 'user' => $user]);
+                ->findOneBy(['id' => $id]);
 
             if ($notebook) {
-                $form = $this->formFactory->create(NotebookType::class, $notebook, ['method' => $request->getMethod()]);
+                if ($notebook->getUser() == $this->tokenStorage->getToken()->getUser()) {
+                    $body = $request->get('notebook');
+                    if (isset($body)) {
+                        /** @var Form $form */
+                        $form = $this->formFactory
+                            ->create(NotebookType::class, $notebook, ['method' => $request->getMethod()]);
 
-                if (isset($body['name'])) {
-                    $body['name'] = preg_replace('/\s+/', ' ', $body['name']);
+                        if (isset($body['name'])) {
+                            $body['name'] = preg_replace('/\s+/', ' ', $body['name']);
+                        }
+                        if (isset($body['private'])) {
+                            $body['private'] = filter_var($body['private'], FILTER_VALIDATE_BOOLEAN);
+                        }
+
+                        $request->request->set('notebook', $body);
+
+                        $form->handleRequest($request);
+
+                        if ($form->isSubmitted() && $form->isValid()) {
+                            $this->em->flush();
+
+                            return ['success' => true];
+                        }
+                        return ['form' => $form, 'success' => false];
+                    }
+                    return ['success' => false];
                 }
-                if (isset($body['private'])) {
-                    $body['private'] = filter_var($body['private'], FILTER_VALIDATE_BOOLEAN);
-                }
-
-                unset($body['id']);
-                $request->request->set('notebook', $body);
-
-                $form->handleRequest($request);
-
-                if ($form->isSubmitted() && $form->isValid()) {
-                    $this->em->flush();
-
-                    return ['success' => true];
-                }
-                return ['form' => $form, 'success' => false];
+                return ['success' => false, 'code' => 403];
             }
-
-            return ['success' => false];
-        } catch (\Exception $e) {
             return ['success' => false];
         }
+        return ['success' => false];
     }
 
     /**
@@ -173,15 +196,21 @@ class NotebookManager
      */
     public function removeNotebook($id): array
     {
-        $user = $this->tokenStorage->getToken()->getUser();
-        $notebook = $this->em->getRepository('ApiBundle:Notebook')
-            ->findOneBy(['id' => $id, 'user' => $user]);
+        if (is_numeric($id)) {
+            /** @var Notebook $notebook */
+            $notebook = $this->em->getRepository('ApiBundle:Notebook')
+                ->findOneBy(['id' => $id]);
 
-        if ($notebook) {
-            $this->em->remove($notebook);
-            $this->em->flush();
+            if ($notebook) {
+                if ($notebook->getUser() == $this->tokenStorage->getToken()->getUser()) {
+                    $this->em->remove($notebook);
+                    $this->em->flush();
 
-            return ['success' => true];
+                    return ['success' => true];
+                }
+                return ['success' => false, 'code' => 403];
+            }
+            return ['success' => false];
         }
         return ['success' => false];
     }

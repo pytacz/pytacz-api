@@ -7,9 +7,9 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use ApiBundle\Entity\Notebook;
+use ApiBundle\Entity\SubNote;
 
-class LoadNotebookData extends AbstractFixture implements FixtureInterface, ContainerAwareInterface
+class LoadSubNoteData extends AbstractFixture implements FixtureInterface, ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
@@ -22,7 +22,7 @@ class LoadNotebookData extends AbstractFixture implements FixtureInterface, Cont
     }
 
     /**
-     * Load notebook into test database
+     * Load subNote into test database
      *
      * @param ObjectManager $manager
      *
@@ -30,21 +30,22 @@ class LoadNotebookData extends AbstractFixture implements FixtureInterface, Cont
      */
     public function load(ObjectManager $manager)
     {
-        $notebook = new Notebook();
-        $notebook->setName('TestNotebook');
-        $notebook->setPrivate(true);
-        $notebook->setUser($this->getReference('user'));
+        $note = new SubNote();
+        $note->setName('TestNote');
+        $note->setContent('test content');
+        $note->setAskable(true);
+        $note->setNote($this->getReference('note'));
 
-        $manager->persist($notebook);
+        $manager->persist($note);
         $manager->flush();
-
-        $this->addReference('notebook', $notebook);
     }
 
     public function getDependencies()
     {
         return [
             LoadUserData::class,
+            LoadNotebookData::class,
+            LoadNoteData::class
         ];
     }
 }

@@ -111,6 +111,7 @@ class Notebook
         $this->user = $user;
         return $this;
     }
+
     /**
      * Get user
      *

@@ -10,6 +10,18 @@ namespace ApiBundle\Repository;
  */
 class NotebookRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function getNotebook($id)
+    {
+        $query = $this->getEntityManager()
+            ->createQuery(
+                'SELECT n.id, n.name, n.private FROM ApiBundle:Notebook n
+            WHERE n.id = :id')
+            ->setParameters([
+                'id' => $id
+            ]);
+        return $query->getResult();
+    }
+
     public function getAllPublicNotebooks($user)
     {
         $query = $this->getEntityManager()
@@ -32,6 +44,19 @@ class NotebookRepository extends \Doctrine\ORM\EntityRepository
             ORDER BY n.id DESC')
             ->setParameters([
                 'user' => $user
+            ]);
+        return $query->getResult();
+    }
+
+    public function findAllNotes($notebook)
+    {
+        $query = $this->getEntityManager()
+            ->createQuery(
+                'SELECT n.id, n.name, n.content, n.askable FROM ApiBundle:Note n
+            WHERE n.notebook = :notebook
+            ORDER BY n.id DESC')
+            ->setParameters([
+                'notebook' => $notebook
             ]);
         return $query->getResult();
     }

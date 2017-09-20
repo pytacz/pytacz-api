@@ -5,12 +5,12 @@ namespace ApiBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Note
+ * SubNote
  *
- * @ORM\Table(name="notes")
- * @ORM\Entity(repositoryClass="ApiBundle\Repository\NoteRepository")
+ * @ORM\Table(name="sub_notes")
+ * @ORM\Entity(repositoryClass="ApiBundle\Repository\SubNoteRepository")
  */
-class Note
+class SubNote
 {
     /**
      * @var int
@@ -43,10 +43,10 @@ class Note
     private $askable;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Notebook", inversedBy="notes", cascade={"remove"})
-     * @ORM\JoinColumn(name="id_notebook", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="Note", inversedBy="sub_notes", cascade={"remove"})
+     * @ORM\JoinColumn(name="id_note", referencedColumnName="id", onDelete="CASCADE")
      */
-    private $notebook;
+    private $note;
 
     /**
      * Get id
@@ -63,7 +63,7 @@ class Note
      *
      * @param string $name
      *
-     * @return Note
+     * @return SubNote
      */
     public function setName($name)
     {
@@ -87,7 +87,7 @@ class Note
      *
      * @param string $content
      *
-     * @return Note
+     * @return SubNote
      */
     public function setContent($content)
     {
@@ -111,7 +111,7 @@ class Note
      *
      * @param boolean $askable
      *
-     * @return Note
+     * @return SubNote
      */
     public function setAskable($askable)
     {
@@ -131,25 +131,25 @@ class Note
     }
 
     /**
-     * Set notebook
+     * Set note
      *
-     * @param \ApiBundle\Entity\Notebook $notebook
+     * @param \ApiBundle\Entity\Note $note
      *
-     * @return Note
+     * @return SubNote
      */
-    public function setNotebook(\ApiBundle\Entity\Notebook $notebook = null)
+    public function setNote(\ApiBundle\Entity\Note $note = null)
     {
-        $this->notebook = $notebook;
+        $this->note = $note;
         return $this;
     }
 
     /**
-     * Get notebook
+     * Get note
      *
-     * @return \ApiBundle\Entity\Notebook
+     * @return \ApiBundle\Entity\Note
      */
-    public function getNotebook()
+    public function getNote()
     {
-        return $this->notebook;
+        return $this->note;
     }
 }
