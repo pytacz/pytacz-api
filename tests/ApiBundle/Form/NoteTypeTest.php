@@ -11,17 +11,22 @@ class NoteTypeTest extends TypeTestCase
     public function testSubmitValidData()
     {
         $formData = [
-            'content' => json_encode([
-                'testLabel' => 'testContent'
-            ])
+            'name' => 'testName',
+            'content' => 'blablabla',
+            'askable' => true
         ];
 
         $form = $this->factory->create(NoteType::class);
 
         $note = new Note();
-        $note->setContent($formData['content']);
+        $note
+            ->setName($formData['name'])
+            ->setContent($formData['content'])
+            ->setAskable($formData['askable']);
         $noteData = [
-            'content' => $note->getContent()
+            'name' => $note->getName(),
+            'content' => $note->getContent(),
+            'askable' => $note->getAskable()
         ];
 
         $form->submit($formData);

@@ -46,9 +46,10 @@ class NotebookManager
 
             if ($form->isSubmitted() && $form->isValid()) {
                 $name = preg_replace('/\s+/', ' ', $body['name']);
-                $notebook->setName($name);
-                $notebook->setPrivate(filter_var($body['private'], FILTER_VALIDATE_BOOLEAN));
-                $notebook->setUser($user);
+                $notebook
+                    ->setName($name)
+                    ->setPrivate(filter_var($body['private'], FILTER_VALIDATE_BOOLEAN))
+                    ->setUser($user);
 
                 $this->em->persist($notebook);
                 $this->em->flush();

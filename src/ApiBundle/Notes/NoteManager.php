@@ -58,10 +58,11 @@ class NoteManager
                 if ($form->isSubmitted() && $form->isValid()) {
                     $name = preg_replace('/\s+/', ' ', $body['name']);
                     $content = preg_replace('/\s+/', ' ', $body['content']);
-                    $note->setName($name);
-                    $note->setContent($content);
-                    $note->setNotebook($notebook);
-                    $note->setAskable(filter_var($body['askable'], FILTER_VALIDATE_BOOLEAN));
+                    $note
+                        ->setName($name)
+                        ->setContent($content)
+                        ->setNotebook($notebook)
+                        ->setAskable(filter_var($body['askable'], FILTER_VALIDATE_BOOLEAN));
                     $this->em->persist($note);
                     $this->em->flush();
                     return ['success' => true, 'id' => $note->getId()];
