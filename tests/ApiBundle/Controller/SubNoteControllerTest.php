@@ -7,7 +7,7 @@ use ApiBundle\Entity\Note;
 use Doctrine\ORM\EntityManager;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 
-class NoteControllerTest extends WebTestCase
+class SubNoteControllerTest extends WebTestCase
 {
     protected function setUp()
     {
@@ -81,18 +81,31 @@ class NoteControllerTest extends WebTestCase
             ->findOneBy(['name' => 'TestNote']);
     }
 
-    public function testPostNotesActionSuccess()
+    /**
+     * Get subNote object from test fixture
+     *
+     * @return object
+     */
+    protected function getFixtureSubNote()
+    {
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine();
+        return $em->getRepository('ApiBundle:SubNote')
+            ->findOneBy(['name' => 'TestSubNote']);
+    }
+
+    public function testPostSubnotesAction()
     {
         $client = $this->createAuthenticatedClient();
-        /** @var Notebook $notebook */
-        $notebook = $this->getFixtureNotebook();
+        /** @var Note $note */
+        $note = $this->getFixtureNote();
 
-        $client->request('POST', '/notes', [
-            'note' => [
+        $client->request('POST', '/subnotes', [
+            'subNote' => [
                 'name' => 'RandomName',
                 'content' => 'blablabla',
                 'askable' => 'false',
-                'id_notebook' => $notebook->getId()
+                'id_note' => $note->getId()
             ]
         ]);
 
@@ -101,15 +114,15 @@ class NoteControllerTest extends WebTestCase
         $this->assertTrue($data['success']);
     }
 
-    public function testPostNotesActionFailure()
+    public function testPostSubnotesActionFailure()
     {
         $client = $this->createAuthenticatedClient();
         /** @var Notebook $notebook */
 
-        $client->request('POST', '/notes', [
-            'note' => [
+        $client->request('POST', '/subnotes', [
+            'subNote' => [
                 'content' => 'blablabla',
-                'id_notebook' => 'wrong'
+                'id_note' => 'wrong'
             ]
         ]);
 
@@ -118,14 +131,14 @@ class NoteControllerTest extends WebTestCase
         $this->assertFalse($data['success']);
     }
 
-    public function testPatchNotesActionSuccess()
+    public function testPatchSubnotesActionSuccess()
     {
         $client = $this->createAuthenticatedClient();
         /** @var Note $note */
         $note = $this->getFixtureNote();
 
-        $client->request('PATCH', sprintf('/notes/%d', $note->getId()), [
-            'note' => [
+        $client->request('PATCH', sprintf('/subnotes/%d', $note->getId()), [
+            'subNote' => [
                 'content' => 'blablabla'
             ]
         ]);
@@ -135,12 +148,12 @@ class NoteControllerTest extends WebTestCase
         $this->assertTrue($data['success']);
     }
 
-    public function testPatchNotesActionFailure()
+    public function testPatchSubnotesActionFailure()
     {
         $client = $this->createAuthenticatedClient();
 
-        $client->request('PATCH', sprintf('/notes/%d', 'wrong'), [
-            'note' => [
+        $client->request('PATCH', sprintf('/subnotes/%d', 'wrong'), [
+            'subNote' => [
                 'content' => 'blablabla'
             ]
         ]);
@@ -150,82 +163,58 @@ class NoteControllerTest extends WebTestCase
         $this->assertFalse($data['success']);
     }
 
-    public function testGetNoteActionSuccess()
+    public function testGetSubnoteActionSuccess()
     {
         $client = $this->createAuthenticatedClient();
         /** @var Note $note */
-        $note = $this->getFixtureNote();
+        $subNote = $this->getFixtureSubNote();
 
-        $client->request('GET', sprintf('/notes/%d', $note->getId()));
+        $client->request('GET', sprintf('/subnotes/%d', $subNote->getId()));
 
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertStatusCode(200, $client);
         $this->assertTrue($data['success']);
-        $this->assertEquals($note->getId(), $data['note'][0]['id']);
+        $this->assertEquals($subNote->getId(), $data['subNote'][0]['id']);
     }
 
-    public function testGetNoteActionFailure()
+    public function testGetSubnoteActionFailure()
     {
         $client = $this->createAuthenticatedClient();
 
-        $client->request('GET', sprintf('/notes/%s', 'wrong')); //not numeric
+        $client->request('GET', sprintf('/subnotes/%s', 'wrong')); //not numeric
 
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertStatusCode(200, $client);
         $this->assertFalse($data['success']);
     }
 
-    public function testGetNoteActionFailure404()
+    public function testGetSubnoteActionFailure404()
     {
         $client = $this->createAuthenticatedClient();
 
-        $client->request('GET', sprintf('/notes/%d', 9999)); //definitely wrong
+        $client->request('GET', sprintf('/subnotes/%d', 9999)); //definitely wrong
 
         $this->assertStatusCode(404, $client);
     }
 
-    public function testDeleteNoteActionSuccess()
+    public function testDeleteSubnoteActionSuccess()
     {
         $client = $this->createAuthenticatedClient();
         /** @var Note $note */
-        $note = $this->getFixtureNote();
+        $subNote = $this->getFixtureSubNote();
 
-        $client->request('DELETE', sprintf('/notes/%d', $note->getId()));
+        $client->request('DELETE', sprintf('/subnotes/%d', $subNote->getId()));
 
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertStatusCode(200, $client);
         $this->assertTrue($data['success']);
     }
 
-    public function testDeleteNoteActionFailure()
+    public function testDeleteSubnoteActionFailure()
     {
         $client = $this->createAuthenticatedClient();
 
-        $client->request('DELETE', sprintf('/notes/%d', 'wrong'));
-
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertStatusCode(200, $client);
-        $this->assertFalse($data['success']);
-    }
-
-    public function testGetNoteSubnotesActionSuccess()
-    {
-        $client = $this->createAuthenticatedClient();
-        /** @var Note $note */
-        $note = $this->getFixtureNote();
-
-        $client->request('GET', sprintf('/notes/%d/subnotes', $note->getId()));
-
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertStatusCode(200, $client);
-        $this->assertTrue($data['success']);
-    }
-
-    public function testGetNoteSubnotesActionFailure()
-    {
-        $client = $this->createAuthenticatedClient();
-
-        $client->request('GET', sprintf('/notes/%d/subnotes', 'wrong'));
+        $client->request('DELETE', sprintf('/subnotes/%d', 'wrong'));
 
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertStatusCode(200, $client);

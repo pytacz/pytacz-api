@@ -2,9 +2,9 @@
 
 namespace ApiBundle\Notes;
 
-use ApiBundle\Entity\User;
 use ApiBundle\Entity\Notebook;
 use ApiBundle\Entity\Note;
+use ApiBundle\Entity\SubNote;
 use Doctrine\ORM\EntityManager;
 use ApiBundle\Form\NoteType;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,7 +12,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
-class NoteManager
+class SubNoteManager
 {
     /** @var EntityManager $em */
     private $em;
@@ -29,45 +29,46 @@ class NoteManager
     }
 
     /**
-     * Create note for logged user base on notebook id from request
+     * Create subNote for logged user base on note id from request
      *
      * @param Request $request
      *
      * @return array
      */
-    public function createNote(Request $request): array
+    public function createSubNote(Request $request): array
     {
-        $body = $request->request->get('note');
-        if (isset($body['id_notebook']) && isset($body['name']) && isset($body['content']) && isset($body['askable'])) {
-            /** @var User $user */
-            $user = $this->tokenStorage->getToken()->getUser();
-            /** @var Notebook $notebook */
-            $notebook = $this->em->getRepository('ApiBundle:Notebook')
-                ->findOneBy(['id' => $body['id_notebook'], 'user' => $user]);
+        $body = $request->request->get('subNote');
+        if (isset($body['id_note']) && isset($body['name']) && isset($body['content']) && isset($body['askable'])) {
+            /** @var Note $note */
+            $note = $this->em->getRepository('ApiBundle:Note')
+                ->findOneBy(['id' => $body['id_note']]);
 
-            if ($notebook) {
-                unset($body['id_notebook']);
-                $note = new Note();
-                /** @var Form $form */
-                $form = $this->formFactory->create(NoteType::class, $note);
-                $request->request->set('note', $body);
+            if ($note) {
+                if ($note->getNotebook()->getUser() == $this->tokenStorage->getToken()->getUser()) {
+                    unset($body['id_note']);
+                    $subNote = new SubNote();
+                    /** @var Form $form */
+                    $form = $this->formFactory->create(NoteType::class, $subNote);
+                    $request->request->set('note', $body);
 
-                $form->handleRequest($request);
+                    $form->handleRequest($request);
 
-                if ($form->isSubmitted() && $form->isValid()) {
-                    $name = preg_replace('/\s+/', ' ', $body['name']);
-                    $content = preg_replace('/\s+/', ' ', $body['content']);
-                    $note
-                        ->setName($name)
-                        ->setContent($content)
-                        ->setNotebook($notebook)
-                        ->setAskable(filter_var($body['askable'], FILTER_VALIDATE_BOOLEAN));
-                    $this->em->persist($note);
-                    $this->em->flush();
-                    return ['success' => true, 'id' => $note->getId()];
+                    if ($form->isSubmitted() && $form->isValid()) {
+                        $name = preg_replace('/\s+/', ' ', $body['name']);
+                        $content = preg_replace('/\s+/', ' ', $body['content']);
+                        $subNote
+                            ->setName($name)
+                            ->setContent($content)
+                            ->setNote($note)
+                            ->setAskable(filter_var($body['askable'], FILTER_VALIDATE_BOOLEAN));
+                        $this->em->persist($subNote);
+                        $this->em->flush();
+                        return ['success' => true, 'id' => $subNote->getId()];
+                    }
+
+                    return ['form' => $form, 'success' => false];
                 }
-
-                return ['form' => $form, 'success' => false];
+                return ['success' => false];
             }
             return ['success' => false];
         }
@@ -75,26 +76,26 @@ class NoteManager
     }
 
     /**
-     * Remove note by id
+     * Remove subNote by id
      *
      * @param string    $id
      * @param Request   $request
      *
      * @return array
      */
-    public function patchNote(Request $request, $id): array
+    public function patchSubNote(Request $request, $id): array
     {
         if (is_numeric($id)) {
             /** @var Note $note */
-            $note = $this->em->getRepository('ApiBundle:Note')
+            $subNote = $this->em->getRepository('ApiBundle:SubNote')
                 ->findOneBy(['id' => $id]);
 
-            if ($note) {
-                $body = $request->get('note');
-                if ($note->getNotebook()->getUser() == $this->tokenStorage->getToken()->getUser()) {
+            if ($subNote) {
+                $body = $request->get('subNote');
+                if ($subNote->getNote()->getNotebook()->getUser() == $this->tokenStorage->getToken()->getUser()) {
                     /** @var Form $form */
                     $form = $this->formFactory
-                        ->create(NoteType::class, $note, ['method' => $request->getMethod()]);
+                        ->create(NoteType::class, $subNote, ['method' => $request->getMethod()]);
 
                     if (isset($body['name'])) {
                         $body['name'] = preg_replace('/\s+/', ' ', $body['name']);
@@ -123,39 +124,39 @@ class NoteManager
     }
 
     /**
-     * Get single note by it's id
+     * Get single subNote by it's id
      *
      * @param string $id
      *
      * @return array
      */
-    public function getNote($id): array
+    public function getSubNote($id): array
     {
         if (is_numeric($id)) {
             /** @var Note $note */
-            $note = $this->em->getRepository('ApiBundle:Note')
+            $subNote = $this->em->getRepository('ApiBundle:SubNote')
                 ->findOneBy(['id' => $id]);
 
-            if ($note) {
+            if ($subNote) {
                 /** @var Notebook $notebook */
-                $notebook = $note->getNotebook();
+                $notebook = $subNote->getNote()->getNotebook();
                 if ($notebook->getPrivate() === true) {
                     if ($notebook->getUser() == $this->tokenStorage->getToken()->getUser()) {
-                        $note = $this->em->getRepository('ApiBundle:Note')
-                            ->findNote($note->getId());
+                        $subNote = $this->em->getRepository('ApiBundle:SubNote')
+                            ->findSubNote($subNote->getId());
                         return [
                             'success' => true,
-                            'note' => $note,
+                            'subNote' => $subNote,
                             'notebook' => $notebook->getId()
                         ];
                     }
                     return ['success' => false, 'code' => 403];
                 }
-                $note = $this->em->getRepository('ApiBundle:Note')
-                    ->findNote($note->getId());
+                $subNote = $this->em->getRepository('ApiBundle:SubNote')
+                    ->findSubNote($subNote->getId());
                 return [
                     'success' => true,
-                    'note' => $note,
+                    'subNote' => $subNote,
                     'notebook' => $notebook->getId()
                 ];
             }
@@ -165,48 +166,39 @@ class NoteManager
     }
 
     /**
-     * Get all notes from notebook with id from parameter
+     * Get all subNotes from note with id from parameter
      *
      * @param string $id
      *
      * @return array
      */
-    public function getNotes($id): array
+    public function getSubNotes($id): array
     {
         if (is_numeric($id)) {
             /** @var Notebook $notebook */
-            $notebook = $this->em->getRepository('ApiBundle:Notebook')
+            $note = $this->em->getRepository('ApiBundle:Note')
                 ->findOneBy(['id' => $id]);
 
-            if ($notebook) {
+            if ($note) {
+                $notebook = $note->getNotebook();
                 if ($notebook->getPrivate() === true) {
                     if ($notebook->getUser() == $this->tokenStorage->getToken()->getUser()) {
-                        $notes = $this->em->getRepository('ApiBundle:Notebook')
-                            ->findAllNotes($notebook);
-                        foreach ($notes as $key => $note) {
-                            $subNotes = $this->em->getRepository('ApiBundle:Note')
-                                ->findAllSubNotes($note['id']);
-                            $notes[$key]['subNotes'] = $subNotes;
-                        }
+                        $notes = $this->em->getRepository('ApiBundle:Note')
+                            ->findAllSubNotes($note);
                         return [
                             'success' => true,
-                            'notes' => $notes,
-                            'notebook' => $notebook->getId()
+                            'subNotes' => $notes,
+                            'note' => $note->getId()
                         ];
                     }
                     return ['success' => false, 'code' => 403];
                 }
-                $notes = $this->em->getRepository('ApiBundle:Notebook')
-                    ->findAllNotes($notebook);
-                foreach ($notes as $key => $note) {
-                    $subNotes = $this->em->getRepository('ApiBundle:Note')
-                        ->findAllSubNotes($note['id']);
-                    $notes[$key]['subNotes'] = $subNotes;
-                }
+                $notes = $this->em->getRepository('ApiBundle:Note')
+                    ->findAllSubNotes($note);
                 return [
                     'success' => true,
-                    'notes' => $notes,
-                    'notebook' => $notebook->getId()
+                    'subNotes' => $notes,
+                    'note' => $note->getId()
                 ];
             }
             return ['success' => false];
@@ -215,22 +207,22 @@ class NoteManager
     }
 
     /**
-     * Remove note by id
+     * Remove subNote by id
      *
      * @param string $id
      *
      * @return array
      */
-    public function removeNote($id): array
+    public function removeSubNote($id): array
     {
         if (is_numeric($id)) {
             /** @var Note $note */
-            $note = $this->em->getRepository('ApiBundle:Note')
+            $subNote = $this->em->getRepository('ApiBundle:SubNote')
                 ->findOneBy(['id' => $id]);
 
-            if ($note) {
-                if ($note->getNotebook()->getUser() == $this->tokenStorage->getToken()->getUser()) {
-                    $this->em->remove($note);
+            if ($subNote) {
+                if ($subNote->getNote()->getNotebook()->getUser() == $this->tokenStorage->getToken()->getUser()) {
+                    $this->em->remove($subNote);
                     $this->em->flush();
 
                     return ['success' => true];

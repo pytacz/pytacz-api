@@ -31,7 +31,7 @@ class LoadSubNoteData extends AbstractFixture implements FixtureInterface, Conta
     public function load(ObjectManager $manager)
     {
         $note = new SubNote();
-        $note->setName('TestNote');
+        $note->setName('TestSubNote');
         $note->setContent('test content');
         $note->setAskable(true);
         $note->setNote($this->getReference('note'));

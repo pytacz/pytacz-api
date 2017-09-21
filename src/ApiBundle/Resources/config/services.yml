@@ -13,6 +13,9 @@ services:
     api.note_manager:
         class: ApiBundle\Notes\NoteManager
         autowire: true
+    api.sub_note_manager:
+        class: ApiBundle\Notes\SubNoteManager
+        autowire: true
     api.authentication_listener:
         class: ApiBundle\EventListeners\AuthenticationListener
         autowire: true

@@ -10,4 +10,15 @@ namespace ApiBundle\Repository;
  */
 class SubNoteRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function findSubNote($id)
+    {
+        $query = $this->getEntityManager()
+            ->createQuery(
+                'SELECT n.id, n.name, n.content, n.askable FROM ApiBundle:SubNote n
+            WHERE n.id = :id')
+            ->setParameters([
+                'id' => $id
+            ]);
+        return $query->getResult();
+    }
 }

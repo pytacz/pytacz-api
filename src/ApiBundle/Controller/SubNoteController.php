@@ -8,11 +8,11 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class NoteController extends FOSRestController
+class SubNoteController extends FOSRestController
 {
-    public function postNotesAction(Request $request)
+    public function postSubnotesAction(Request $request)
     {
-        $data = $this->get('api.note_manager')->createNote($request);
+        $data = $this->get('api.sub_note_manager')->createSubNote($request);
 
         if ($data['success']) {
             return $data;
@@ -34,9 +34,9 @@ class NoteController extends FOSRestController
         }
     }
 
-    public function patchNotesAction(Request $request, $id)
+    public function patchSubnotesAction(Request $request, $id)
     {
-        $data = $this->get('api.note_manager')->patchNote($request, $id);
+        $data = $this->get('api.sub_note_manager')->patchSubNote($request, $id);
 
         if ($data['success']) {
             return $data;
@@ -63,9 +63,9 @@ class NoteController extends FOSRestController
         }
     }
 
-    public function getNoteAction($id)
+    public function getSubnoteAction($id)
     {
-        $data = $this->get('api.note_manager')->getNote($id);
+        $data = $this->get('api.sub_note_manager')->getSubNote($id);
         if (isset($data['code'])) {
             if ($data['code'] == 403) {
                 throw new AccessDeniedHttpException();
@@ -76,20 +76,9 @@ class NoteController extends FOSRestController
         return $data;
     }
 
-    public function deleteNoteAction($id)
+    public function deleteSubnoteAction($id)
     {
-        $data = $this->get('api.note_manager')->removeNote($id);
-        if (isset($data['code'])) {
-            if ($data['code'] == 403) {
-                throw new AccessDeniedHttpException();
-            }
-        }
-        return $data;
-    }
-
-    public function getNoteSubnotesAction($id)
-    {
-        $data = $this->get('api.sub_note_manager')->getSubNotes($id);
+        $data = $this->get('api.sub_note_manager')->removeSubNote($id);
         if (isset($data['code'])) {
             if ($data['code'] == 403) {
                 throw new AccessDeniedHttpException();

@@ -14,3 +14,6 @@ api_notebook:
 api_note:
     resource: ApiBundle:Note
     type: rest
+api_sub_note:
+    resource: ApiBundle:SubNote
+    type: rest

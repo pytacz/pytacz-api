@@ -21,4 +21,18 @@ class NoteRepository extends \Doctrine\ORM\EntityRepository
             ]);
         return $query->getResult();
     }
+
+    public function findAllSubNotes($noteId)
+    {
+        $query = $this->getEntityManager()
+            ->createQuery(
+                'SELECT sn.id, sn.name, sn.content, sn.askable FROM ApiBundle:SubNote sn
+            JOIN sn.note n
+            WHERE n.id = :id
+            ORDER BY sn.id DESC')
+            ->setParameters([
+                'id' => $noteId
+            ]);
+        return $query->getResult();
+    }
 }

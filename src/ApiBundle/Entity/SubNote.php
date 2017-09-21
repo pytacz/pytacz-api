@@ -43,7 +43,7 @@ class SubNote
     private $askable;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Note", inversedBy="sub_notes", cascade={"remove"})
+     * @ORM\ManyToOne(targetEntity="Note", inversedBy="sub_notes")
      * @ORM\JoinColumn(name="id_note", referencedColumnName="id", onDelete="CASCADE")
      */
     private $note;
