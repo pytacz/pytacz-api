@@ -63,7 +63,10 @@ class SubNoteManager
                             ->setAskable(filter_var($body['askable'], FILTER_VALIDATE_BOOLEAN));
                         $this->em->persist($subNote);
                         $this->em->flush();
-                        return ['success' => true, 'id' => $subNote->getId()];
+                        /** @var SubNote $subNote */
+                        $subNote = $this->em->getRepository('ApiBundle:SubNote')
+                            ->findSubNote($subNote->getId());
+                        return ['success' => true, 'subNote' => $subNote];
                     }
 
                     return ['form' => $form, 'success' => false];
@@ -96,15 +99,19 @@ class SubNoteManager
                     /** @var Form $form */
                     $form = $this->formFactory
                         ->create(NoteType::class, $subNote, ['method' => $request->getMethod()]);
+                    $result = [];
 
                     if (isset($body['name'])) {
                         $body['name'] = preg_replace('/\s+/', ' ', $body['name']);
+                        $result['name'] = $body['name'];
                     }
                     if (isset($body['askable'])) {
                         $body['askable'] = filter_var($body['private'], FILTER_VALIDATE_BOOLEAN);
+                        $result['askable'] = $body['askable'];
                     }
                     if (isset($body['content'])) {
                         $body['content'] = preg_replace('/\s+/', ' ', $body['content']);
+                        $result['content'] = $body['content'];
                     }
                     $request->request->set('note', $body);
 
@@ -112,7 +119,7 @@ class SubNoteManager
 
                     if ($form->isSubmitted() && $form->isValid()) {
                         $this->em->flush();
-                        return ['success' => true];
+                        return ['success' => true, 'result' => $result];
                     }
                     return ['form' => $form, 'success' => false];
                 }

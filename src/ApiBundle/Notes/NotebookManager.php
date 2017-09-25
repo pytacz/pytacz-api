@@ -54,7 +54,14 @@ class NotebookManager
                 $this->em->persist($notebook);
                 $this->em->flush();
 
-                return ['success' => true, 'id' => $notebook->getId()];
+                /** @var Notebook $notebook */
+                $notebook = $this->em->getRepository('ApiBundle:Notebook')
+                    ->getNotebook($notebook->getId());
+
+                return [
+                    'success' => true,
+                    'notebook' => $notebook
+                ];
             }
         }
         return ['form' => $form, 'success' => false];
@@ -160,12 +167,15 @@ class NotebookManager
                         /** @var Form $form */
                         $form = $this->formFactory
                             ->create(NotebookType::class, $notebook, ['method' => $request->getMethod()]);
+                        $result = [];
 
                         if (isset($body['name'])) {
                             $body['name'] = preg_replace('/\s+/', ' ', $body['name']);
+                            $result['name'] = $body['name'];
                         }
                         if (isset($body['private'])) {
                             $body['private'] = filter_var($body['private'], FILTER_VALIDATE_BOOLEAN);
+                            $result['private'] = $body['private'];
                         }
 
                         $request->request->set('notebook', $body);
@@ -175,7 +185,10 @@ class NotebookManager
                         if ($form->isSubmitted() && $form->isValid()) {
                             $this->em->flush();
 
-                            return ['success' => true];
+                            return [
+                                'success' => true,
+                                'result' => $result
+                            ];
                         }
                         return ['form' => $form, 'success' => false];
                     }

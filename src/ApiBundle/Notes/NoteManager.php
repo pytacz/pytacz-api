@@ -64,7 +64,10 @@ class NoteManager
                         ->setAskable(filter_var($body['askable'], FILTER_VALIDATE_BOOLEAN));
                     $this->em->persist($note);
                     $this->em->flush();
-                    return ['success' => true, 'id' => $note->getId()];
+                    /** @var Note $note */
+                    $note = $this->em->getRepository('ApiBundle:Note')
+                        ->findNote($note->getId());
+                    return ['success' => true, 'note' => $note];
                 }
 
                 return ['form' => $form, 'success' => false];
@@ -95,15 +98,19 @@ class NoteManager
                     /** @var Form $form */
                     $form = $this->formFactory
                         ->create(NoteType::class, $note, ['method' => $request->getMethod()]);
+                    $result = [];
 
                     if (isset($body['name'])) {
                         $body['name'] = preg_replace('/\s+/', ' ', $body['name']);
+                        $result['name'] = $body['name'];
                     }
                     if (isset($body['askable'])) {
                         $body['askable'] = filter_var($body['private'], FILTER_VALIDATE_BOOLEAN);
+                        $result['askable'] = $body['askable'];
                     }
                     if (isset($body['content'])) {
                         $body['content'] = preg_replace('/\s+/', ' ', $body['content']);
+                        $result['content'] = $body['content'];
                     }
                     $request->request->set('note', $body);
 
@@ -111,7 +118,7 @@ class NoteManager
 
                     if ($form->isSubmitted() && $form->isValid()) {
                         $this->em->flush();
-                        return ['success' => true];
+                        return ['success' => true, 'result' => $result];
                     }
                     return ['form' => $form, 'success' => false];
                 }
