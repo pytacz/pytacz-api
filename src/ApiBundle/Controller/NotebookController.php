@@ -89,9 +89,9 @@ class NotebookController extends FOSRestController
         return $data;
     }
 
-    public function getNotebookNotesAction($id)
+    public function getNotebookNotesAction(Request $request, $id)
     {
-        $data = $this->get('api.note_manager')->getNotes($id);
+        $data = $this->get('api.note_manager')->getNotes($request, $id);
         if (isset($data['code'])) {
             if ($data['code'] == 403) {
                 throw new AccessDeniedHttpException();

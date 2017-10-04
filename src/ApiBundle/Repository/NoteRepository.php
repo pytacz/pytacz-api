@@ -29,9 +29,21 @@ class NoteRepository extends \Doctrine\ORM\EntityRepository
                 'SELECT sn.id, sn.name, sn.content, sn.askable FROM ApiBundle:SubNote sn
             JOIN sn.note n
             WHERE n.id = :id
-            ORDER BY sn.id DESC')
+            ORDER BY sn.id ASC')
             ->setParameters([
                 'id' => $noteId
+            ]);
+        return $query->getResult();
+    }
+
+    public function countSubNotes($note)
+    {
+        $query = $this->getEntityManager()
+            ->createQuery(
+                'SELECT COUNT(sn.id) amount FROM ApiBundle:SubNote sn
+            WHERE sn.note = :note')
+            ->setParameters([
+                'note' => $note
             ]);
         return $query->getResult();
     }

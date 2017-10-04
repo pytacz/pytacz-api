@@ -48,15 +48,41 @@ class NotebookRepository extends \Doctrine\ORM\EntityRepository
         return $query->getResult();
     }
 
-    public function findAllNotes($notebook)
+    public function findAllNotes($notebook, $startPoint)
+    {
+        if ($startPoint == null) {
+            $query = $this->getEntityManager()
+                ->createQuery(
+                    'SELECT n.id, n.name, n.content, n.askable FROM ApiBundle:Note n
+                WHERE n.notebook = :notebook
+                ORDER BY n.id DESC')
+                ->setMaxResults(20)
+                ->setParameters([
+                    'notebook' => $notebook
+                ]);
+        } else {
+            $query = $this->getEntityManager()
+                ->createQuery(
+                    'SELECT n.id, n.name, n.content, n.askable FROM ApiBundle:Note n
+                WHERE n.notebook = :notebook AND n.id <= :start
+                ORDER BY n.id DESC')
+                ->setMaxResults(20)
+                ->setParameters([
+                    'notebook' => $notebook,
+                    'start' => $startPoint
+                ]);
+        }
+        return $query->getResult();
+    }
+
+    public function countNotebooks($user)
     {
         $query = $this->getEntityManager()
             ->createQuery(
-                'SELECT n.id, n.name, n.content, n.askable FROM ApiBundle:Note n
-            WHERE n.notebook = :notebook
-            ORDER BY n.id DESC')
+                'SELECT COUNT(n.id) amount FROM ApiBundle:Notebook n
+            WHERE n.user = :user')
             ->setParameters([
-                'notebook' => $notebook
+                'user' => $user
             ]);
         return $query->getResult();
     }

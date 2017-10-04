@@ -67,6 +67,7 @@ class NoteManager
                     /** @var Note $note */
                     $note = $this->em->getRepository('ApiBundle:Note')
                         ->findNote($note->getId());
+                    $note[0]['subNotes'] = [];
                     return ['success' => true, 'note' => $note];
                 }
 
@@ -105,7 +106,7 @@ class NoteManager
                         $result['name'] = $body['name'];
                     }
                     if (isset($body['askable'])) {
-                        $body['askable'] = filter_var($body['private'], FILTER_VALIDATE_BOOLEAN);
+                        $body['askable'] = filter_var($body['askable'], FILTER_VALIDATE_BOOLEAN);
                         $result['askable'] = $body['askable'];
                     }
                     if (isset($body['content'])) {
@@ -174,11 +175,12 @@ class NoteManager
     /**
      * Get all notes from notebook with id from parameter
      *
-     * @param string $id
+     * @param Request   $request
+     * @param string    $id
      *
      * @return array
      */
-    public function getNotes($id): array
+    public function getNotes($request, $id): array
     {
         if (is_numeric($id)) {
             /** @var Notebook $notebook */
@@ -186,34 +188,48 @@ class NoteManager
                 ->findOneBy(['id' => $id]);
 
             if ($notebook) {
-                if ($notebook->getPrivate() === true) {
-                    if ($notebook->getUser() == $this->tokenStorage->getToken()->getUser()) {
-                        $notes = $this->em->getRepository('ApiBundle:Notebook')
-                            ->findAllNotes($notebook);
-                        foreach ($notes as $key => $note) {
-                            $subNotes = $this->em->getRepository('ApiBundle:Note')
-                                ->findAllSubNotes($note['id']);
-                            $notes[$key]['subNotes'] = $subNotes;
-                        }
-                        return [
-                            'success' => true,
-                            'notes' => $notes,
-                            'notebook' => $notebook->getId()
-                        ];
+                $startPoint = $request->query->get('start_point');
+                if (isset($startPoint)) {
+                    if (!is_numeric($startPoint) && $startPoint != null) {
+                        return ['success' => false];
                     }
-                    return ['success' => false, 'code' => 403];
+                } else {
+                    $startPoint = null;
                 }
+
                 $notes = $this->em->getRepository('ApiBundle:Notebook')
-                    ->findAllNotes($notebook);
+                    ->findAllNotes($notebook, $startPoint);
                 foreach ($notes as $key => $note) {
                     $subNotes = $this->em->getRepository('ApiBundle:Note')
                         ->findAllSubNotes($note['id']);
                     $notes[$key]['subNotes'] = $subNotes;
                 }
+                if (count($notes) < 20) {
+                    $newStartPoint = null;
+                } else {
+                    $newStartPoint = end($notes)['id']-1;
+                    if ($newStartPoint <= 0) {
+                        $newStartPoint = null;
+                    }
+                }
+
+                if ($notebook->getPrivate() === true) {
+                    if ($notebook->getUser() == $this->tokenStorage->getToken()->getUser()) {
+                        return [
+                            'success' => true,
+                            'notes' => $notes,
+                            'notebook' => $notebook->getId(),
+                            'start_point' => $newStartPoint
+                        ];
+                    }
+                    return ['success' => false, 'code' => 403];
+                }
+
                 return [
                     'success' => true,
                     'notes' => $notes,
-                    'notebook' => $notebook->getId()
+                    'notebook' => $notebook->getId(),
+                    'start_point' => $newStartPoint
                 ];
             }
             return ['success' => false];

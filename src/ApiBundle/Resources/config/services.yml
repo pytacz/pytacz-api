@@ -35,3 +35,8 @@ services:
         autowire: true
         tags:
             - { name: validator.constraint_validator }
+    api.notebooks_counter:
+        class: ApiBundle\Validator\Constraints\NotebooksCounterValidator
+        autowire: true
+        tags:
+            - { name: validator.constraint_validator }

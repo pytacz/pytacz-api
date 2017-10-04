@@ -126,7 +126,9 @@ class NoteControllerTest extends WebTestCase
 
         $client->request('PATCH', sprintf('/notes/%d', $note->getId()), [
             'note' => [
-                'content' => 'blablabla'
+                'name' => 'testName',
+                'content' => 'blablabla',
+                'askable' => true
             ]
         ]);
 

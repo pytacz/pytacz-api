@@ -101,7 +101,7 @@ class SubNoteControllerTest extends WebTestCase
         $note = $this->getFixtureNote();
 
         $client->request('POST', '/subnotes', [
-            'subNote' => [
+            'sub_note' => [
                 'name' => 'RandomName',
                 'content' => 'blablabla',
                 'askable' => 'false',
@@ -120,7 +120,7 @@ class SubNoteControllerTest extends WebTestCase
         /** @var Notebook $notebook */
 
         $client->request('POST', '/subnotes', [
-            'subNote' => [
+            'sub_note' => [
                 'content' => 'blablabla',
                 'id_note' => 'wrong'
             ]
@@ -138,8 +138,10 @@ class SubNoteControllerTest extends WebTestCase
         $note = $this->getFixtureNote();
 
         $client->request('PATCH', sprintf('/subnotes/%d', $note->getId()), [
-            'subNote' => [
-                'content' => 'blablabla'
+            'sub_note' => [
+                'name' => 'testName',
+                'content' => 'blablabla',
+                'askable' => false
             ]
         ]);
 
@@ -153,7 +155,7 @@ class SubNoteControllerTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
 
         $client->request('PATCH', sprintf('/subnotes/%d', 'wrong'), [
-            'subNote' => [
+            'sub_note' => [
                 'content' => 'blablabla'
             ]
         ]);
@@ -174,7 +176,7 @@ class SubNoteControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertStatusCode(200, $client);
         $this->assertTrue($data['success']);
-        $this->assertEquals($subNote->getId(), $data['subNote'][0]['id']);
+        $this->assertEquals($subNote->getId(), $data['sub_note'][0]['id']);
     }
 
     public function testGetSubnoteActionFailure()

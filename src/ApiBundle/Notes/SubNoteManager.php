@@ -6,7 +6,7 @@ use ApiBundle\Entity\Notebook;
 use ApiBundle\Entity\Note;
 use ApiBundle\Entity\SubNote;
 use Doctrine\ORM\EntityManager;
-use ApiBundle\Form\NoteType;
+use ApiBundle\Form\SubNoteType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
@@ -37,7 +37,7 @@ class SubNoteManager
      */
     public function createSubNote(Request $request): array
     {
-        $body = $request->request->get('subNote');
+        $body = $request->request->get('sub_note');
         if (isset($body['id_note']) && isset($body['name']) && isset($body['content']) && isset($body['askable'])) {
             /** @var Note $note */
             $note = $this->em->getRepository('ApiBundle:Note')
@@ -47,10 +47,11 @@ class SubNoteManager
                 if ($note->getNotebook()->getUser() == $this->tokenStorage->getToken()->getUser()) {
                     unset($body['id_note']);
                     $subNote = new SubNote();
+                    $subNote->setNote($note);
+                    $body['note'] = $note->getId();
                     /** @var Form $form */
-                    $form = $this->formFactory->create(NoteType::class, $subNote);
-                    $request->request->set('note', $body);
-
+                    $form = $this->formFactory->create(SubNoteType::class, $subNote);
+                    $request->request->set('sub_note', $body);
                     $form->handleRequest($request);
 
                     if ($form->isSubmitted() && $form->isValid()) {
@@ -66,7 +67,7 @@ class SubNoteManager
                         /** @var SubNote $subNote */
                         $subNote = $this->em->getRepository('ApiBundle:SubNote')
                             ->findSubNote($subNote->getId());
-                        return ['success' => true, 'subNote' => $subNote];
+                        return ['success' => true, 'sub_note' => $subNote];
                     }
 
                     return ['form' => $form, 'success' => false];
@@ -89,16 +90,16 @@ class SubNoteManager
     public function patchSubNote(Request $request, $id): array
     {
         if (is_numeric($id)) {
-            /** @var Note $note */
+            /** @var SubNote $subNote */
             $subNote = $this->em->getRepository('ApiBundle:SubNote')
                 ->findOneBy(['id' => $id]);
 
             if ($subNote) {
-                $body = $request->get('subNote');
+                $body = $request->get('sub_note');
                 if ($subNote->getNote()->getNotebook()->getUser() == $this->tokenStorage->getToken()->getUser()) {
                     /** @var Form $form */
                     $form = $this->formFactory
-                        ->create(NoteType::class, $subNote, ['method' => $request->getMethod()]);
+                        ->create(SubNoteType::class, $subNote, ['method' => $request->getMethod()]);
                     $result = [];
 
                     if (isset($body['name'])) {
@@ -106,14 +107,14 @@ class SubNoteManager
                         $result['name'] = $body['name'];
                     }
                     if (isset($body['askable'])) {
-                        $body['askable'] = filter_var($body['private'], FILTER_VALIDATE_BOOLEAN);
+                        $body['askable'] = filter_var($body['askable'], FILTER_VALIDATE_BOOLEAN);
                         $result['askable'] = $body['askable'];
                     }
                     if (isset($body['content'])) {
                         $body['content'] = preg_replace('/\s+/', ' ', $body['content']);
                         $result['content'] = $body['content'];
                     }
-                    $request->request->set('note', $body);
+                    $request->request->set('sub_note', $body);
 
                     $form->handleRequest($request);
 
@@ -153,7 +154,7 @@ class SubNoteManager
                             ->findSubNote($subNote->getId());
                         return [
                             'success' => true,
-                            'subNote' => $subNote,
+                            'sub_note' => $subNote,
                             'notebook' => $notebook->getId()
                         ];
                     }
@@ -163,7 +164,7 @@ class SubNoteManager
                     ->findSubNote($subNote->getId());
                 return [
                     'success' => true,
-                    'subNote' => $subNote,
+                    'sub_note' => $subNote,
                     'notebook' => $notebook->getId()
                 ];
             }
@@ -194,7 +195,7 @@ class SubNoteManager
                             ->findAllSubNotes($note);
                         return [
                             'success' => true,
-                            'subNotes' => $notes,
+                            'sub_notes' => $notes,
                             'note' => $note->getId()
                         ];
                     }
@@ -204,7 +205,7 @@ class SubNoteManager
                     ->findAllSubNotes($note);
                 return [
                     'success' => true,
-                    'subNotes' => $notes,
+                    'sub_notes' => $notes,
                     'note' => $note->getId()
                 ];
             }

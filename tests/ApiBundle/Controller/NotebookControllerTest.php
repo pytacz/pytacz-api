@@ -133,6 +133,7 @@ class NotebookControllerTest extends WebTestCase
 
         $client->request('PATCH', sprintf('/notebooks/%d', $notebook->getId()), [
             'notebook' => [
+                'name' => 'testname',
                 'private' => 'true'
             ]
         ]);
