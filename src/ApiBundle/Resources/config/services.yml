@@ -7,6 +7,15 @@ services:
     api.registration:
         class: ApiBundle\User\Register
         arguments: ['@doctrine.orm.entity_manager', '@form.factory', '@security.password_encoder']
+    api.notebook_manager:
+        class: ApiBundle\Notes\NotebookManager
+        autowire: true
+    api.note_manager:
+        class: ApiBundle\Notes\NoteManager
+        autowire: true
+    api.sub_note_manager:
+        class: ApiBundle\Notes\SubNoteManager
+        autowire: true
     api.authentication_listener:
         class: ApiBundle\EventListeners\AuthenticationListener
         autowire: true
@@ -21,3 +30,13 @@ services:
     api.security.refresh_token:
         class: ApiBundle\Security\RefreshToken
         autowire: true
+    api.notebook_name_unique:
+        class: ApiBundle\Validator\Constraints\NotebookNameUniqueValidator
+        autowire: true
+        tags:
+            - { name: validator.constraint_validator }
+    api.notebooks_counter:
+        class: ApiBundle\Validator\Constraints\NotebooksCounterValidator
+        autowire: true
+        tags:
+            - { name: validator.constraint_validator }

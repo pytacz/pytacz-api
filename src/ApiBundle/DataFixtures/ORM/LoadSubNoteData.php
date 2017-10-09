@@ -7,9 +7,9 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use ApiBundle\Entity\User;
+use ApiBundle\Entity\SubNote;
 
-class LoadUserData extends AbstractFixture implements FixtureInterface, ContainerAwareInterface
+class LoadSubNoteData extends AbstractFixture implements FixtureInterface, ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
@@ -22,7 +22,7 @@ class LoadUserData extends AbstractFixture implements FixtureInterface, Containe
     }
 
     /**
-     * Load user into test database
+     * Load subNote into test database
      *
      * @param ObjectManager $manager
      *
@@ -30,18 +30,22 @@ class LoadUserData extends AbstractFixture implements FixtureInterface, Containe
      */
     public function load(ObjectManager $manager)
     {
-        $user = new User();
-        $user->setUsername('TestUser');
-        $user->setEmail('test@foo.com');
-        $password = $this->container->get('security.password_encoder')->encodePassword($user, 'testpassword');
-        $user->setPassword($password);
-        $user->setIsActive(true);
-        $user->setRegisterIp('127.0.0.1');
-        $user->setRegisterDate(new \DateTime());
+        $note = new SubNote();
+        $note->setName('TestSubNote');
+        $note->setContent('test content');
+        $note->setAskable(true);
+        $note->setNote($this->getReference('note'));
 
-        $manager->persist($user);
+        $manager->persist($note);
         $manager->flush();
+    }
 
-        $this->addReference('user', $user);
+    public function getDependencies()
+    {
+        return [
+            LoadUserData::class,
+            LoadNotebookData::class,
+            LoadNoteData::class
+        ];
     }
 }
