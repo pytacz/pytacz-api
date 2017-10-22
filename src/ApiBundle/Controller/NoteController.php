@@ -97,4 +97,15 @@ class NoteController extends FOSRestController
         }
         return $data;
     }
+
+    public function postNoteAnswersAction(Request $request, $id)
+    {
+        $data = $this->get('api.answer_manager')->postAnswer($request, $id);
+        if (isset($data['code'])) {
+            if ($data['code'] == 403) {
+                throw new AccessDeniedHttpException();
+            }
+        }
+        return $data;
+    }
 }

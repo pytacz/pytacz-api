@@ -47,4 +47,23 @@ class NoteRepository extends \Doctrine\ORM\EntityRepository
             ]);
         return $query->getResult();
     }
+
+    public function findAllAskableSubNotes($noteId, $reverse = false)
+    {
+        if ($reverse === true) {
+            $sqlData = 'SELECT sn.content';
+        } else {
+            $sqlData = 'SELECT sn.name';
+        }
+        $query = $this->getEntityManager()
+            ->createQuery(
+                $sqlData . ', sn.id FROM ApiBundle:SubNote sn
+            JOIN sn.note n
+            WHERE n.id = :id AND sn.askable = true
+            ORDER BY sn.id ASC')
+            ->setParameters([
+                'id' => $noteId
+            ]);
+        return $query->getResult();
+    }
 }

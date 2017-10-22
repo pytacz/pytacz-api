@@ -40,3 +40,9 @@ services:
         autowire: true
         tags:
             - { name: validator.constraint_validator }
+    api.answer_manager:
+        class: ApiBundle\Notes\QA\AnswerManager
+        autowire: true
+    api.question_manager:
+        class: ApiBundle\Notes\QA\QuestionManager
+        autowire: true

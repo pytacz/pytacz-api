@@ -99,4 +99,15 @@ class NotebookController extends FOSRestController
         }
         return $data;
     }
+
+    public function getNotebookQuestionAction(Request $request, $id)
+    {
+        $data = $this->get('api.question_manager')->getQuestion($request, $id);
+        if (isset($data['code'])) {
+            if ($data['code'] == 403) {
+                throw new AccessDeniedHttpException();
+            }
+        }
+        return $data;
+    }
 }
