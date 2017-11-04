@@ -4,6 +4,7 @@ namespace Tests\ApiBundle\Controller;
 
 use ApiBundle\Entity\Notebook;
 use ApiBundle\Entity\Note;
+use ApiBundle\Entity\SubNote;
 use Doctrine\ORM\EntityManager;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 
@@ -79,6 +80,19 @@ class NoteControllerTest extends WebTestCase
         $em = $this->getDoctrine();
         return $em->getRepository('ApiBundle:Note')
             ->findOneBy(['name' => 'TestNote']);
+    }
+
+    /**
+     * Get subNote object from test fixture
+     *
+     * @return object
+     */
+    protected function getFixtureSubNote()
+    {
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine();
+        return $em->getRepository('ApiBundle:SubNote')
+            ->findOneBy(['name' => 'TestSubNote']);
     }
 
     public function testPostNotesActionSuccess()
@@ -232,5 +246,119 @@ class NoteControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertStatusCode(200, $client);
         $this->assertFalse($data['success']);
+    }
+
+    public function testPostNoteAnswersActionSuccess()
+    {
+        $client = $this->createAuthenticatedClient();
+        /** @var Note $note */
+        $note = $this->getFixtureNote();
+        /** @var SubNote $subNote */
+        $subNote = $this->getFixtureSubNote();
+
+        $client->request('POST', sprintf('/notes/%d/answers', $note->getId()), [
+            'answer' => [
+                'answer' => 'test content',
+                'sub_notes' => [
+                    0 => [
+                        'id' => $subNote->getId(),
+                        'answer' => 'test content'
+                    ]
+                ],
+                'reverse' => false
+            ]
+        ]);
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertStatusCode(200, $client);
+        $this->assertTrue($data['success']);
+        $this->assertTrue($data['correct']);
+
+        //reverse
+        $client->request('POST', sprintf('/notes/%d/answers', $note->getId()), [
+            'answer' => [
+                'answer' => 'TestNote',
+                'sub_notes' => [
+                    0 => [
+                        'id' => $subNote->getId(),
+                        'answer' => 'TestSubNote'
+                    ]
+                ],
+                'reverse' => true
+            ]
+        ]);
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertStatusCode(200, $client);
+        $this->assertTrue($data['success']);
+    }
+
+    public function testPostNoteAnswersActionFailure()
+    {
+        $client = $this->createAuthenticatedClient();
+
+        $client->request('POST', sprintf('/notes/%d/answers', 'wrong_id'));
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertStatusCode(200, $client);
+        $this->assertFalse($data['success']);
+    }
+
+    public function testPostNoteAnswersActionIncorrect()
+    {
+        $client = $this->createAuthenticatedClient();
+        /** @var Note $note */
+        $note = $this->getFixtureNote();
+        /** @var SubNote $subNote */
+        $subNote = $this->getFixtureSubNote();
+
+        $client->request('POST', sprintf('/notes/%d/answers', $note->getId()), [
+            'answer' => [
+                'answer' => 'bad answer',
+                'sub_notes' => [
+                    0 => [
+                        'id' => $subNote->getId(),
+                        'answer' => 'bad answer'
+                    ]
+                ],
+                'reverse' => false
+            ]
+        ]);
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertStatusCode(200, $client);
+        $this->assertTrue($data['success']);
+        $this->assertFalse($data['correct']);
+        $this->assertEquals($data['answer']['id'], $note->getId());
+        $this->assertEquals($data['answer']['sub_notes'][0]['id'], $subNote->getId());
+        $this->assertEquals($data['answer']['field'], $note->getName());
+        $this->assertEquals($data['answer']['answer'], $note->getContent());
+        $this->assertEquals($data['answer']['sub_notes'][0]['field'], $subNote->getName());
+        $this->assertEquals($data['answer']['sub_notes'][0]['answer'], $subNote->getContent());
+
+        //reverse
+        $client->request('POST', sprintf('/notes/%d/answers', $note->getId()), [
+            'answer' => [
+                'answer' => 'bad answer',
+                'sub_notes' => [
+                    0 => [
+                        'id' => $subNote->getId(),
+                        'answer' => 'bad answer'
+                    ]
+                ],
+                'reverse' => true
+            ]
+        ]);
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertStatusCode(200, $client);
+        $this->assertTrue($data['success']);
+        $this->assertFalse($data['correct']);
+        $this->assertEquals($data['answer']['id'], $note->getId());
+        $this->assertEquals($data['answer']['sub_notes'][0]['id'], $subNote->getId());
+        $this->assertEquals($data['answer']['field'], $note->getContent());
+        $this->assertEquals($data['answer']['answer'], $note->getName());
+        $this->assertEquals($data['answer']['sub_notes'][0]['field'], $subNote->getContent());
+        $this->assertEquals($data['answer']['sub_notes'][0]['answer'], $subNote->getName());
     }
 }

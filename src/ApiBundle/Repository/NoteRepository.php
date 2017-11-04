@@ -48,7 +48,7 @@ class NoteRepository extends \Doctrine\ORM\EntityRepository
         return $query->getResult();
     }
 
-    public function findAllAskableSubNotes($noteId, $reverse = false)
+    public function findAllAskableSubNotes($noteId, $reverse)
     {
         if ($reverse === true) {
             $sqlData = 'SELECT sn.content';
@@ -58,9 +58,30 @@ class NoteRepository extends \Doctrine\ORM\EntityRepository
         $query = $this->getEntityManager()
             ->createQuery(
                 $sqlData . ', sn.id FROM ApiBundle:SubNote sn
-            JOIN sn.note n
-            WHERE n.id = :id AND sn.askable = true
-            ORDER BY sn.id ASC')
+                JOIN sn.note n
+                WHERE n.id = :id AND sn.askable = true
+                ORDER BY sn.id ASC'
+            )
+            ->setParameters([
+                'id' => $noteId
+            ]);
+        return $query->getResult();
+    }
+
+    public function findAnswersForSubNotes($noteId, $reverse)
+    {
+        if ($reverse === true) {
+            $sqlData = 'SELECT sn.content as field, sn.name as answer';
+        } else {
+            $sqlData = 'SELECT sn.content as answer, sn.name as field';
+        }
+        $query = $this->getEntityManager()
+            ->createQuery(
+                $sqlData . ', sn.id FROM ApiBundle:SubNote sn
+                JOIN sn.note n
+                WHERE n.id = :id AND sn.askable = true
+                ORDER BY sn.id ASC'
+            )
             ->setParameters([
                 'id' => $noteId
             ]);

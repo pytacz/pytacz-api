@@ -45,40 +45,46 @@ class AnswerManager
 
                 $body = $request->request->get('answer');
 
-                if ($body['reverse']) {
+                if (!isset($body['reverse']) || $body['reverse'] === false) {
+                    $answerField = $note->getContent();
                     $field = $note->getName();
-                    $subField = 'name';
                 } else {
+                    $answerField = $note->getName();
                     $field = $note->getContent();
-                    $subField = 'content';
                 }
 
-                if ($field !== $body['answer'] && $note->getAskable() === true) {
+                if ($answerField !== $body['answer'] && $note->getAskable() === true) {
                     $answer->setCorrect(false);
                 }
 
+                if (isset($body['reverse'])) {
+                    $body['reverse'] = filter_var($body['reverse'], FILTER_VALIDATE_BOOLEAN);
+                } else {
+                    $body['reverse'] = false;
+                }
+
                 $subNotes = $this->em->getRepository('ApiBundle:Note')
-                    ->findAllAskableSubNotes($note->getId());
+                    ->findAnswersForSubNotes($note->getId(), $body['reverse']);
 
                 if (isset($body['sub_notes']) && !empty($subNotes)) {
-                    foreach ($subNotes as $subNote) {
+                    foreach ($subNotes as $key => $subNote) {
                         $isFound = false;
                         foreach ($body['sub_notes'] as $reqSubNote) {
                             if ($subNote['id'] == $reqSubNote['id']) {
                                 $isFound = true;
-                                if ($subNote[$subField] !== $reqSubNote['answer']) {
+                                if ($subNote['answer'] !== $reqSubNote['answer']) {
                                     $answer->setCorrect(false);
                                 }
                             }
                         }
                         if (!$isFound) {
-                            return ['success' => false, 'result' => 'not every answer'];
+                            return ['success' => false];
                         }
                     }
 
                     $user = $this->tokenStorage->getToken()->getUser();
-                    if ($note->getNotebook()->getPrivate() === true && $user === $note->getNotebook()->getUser()) {
-                        return ['succes' => false, 'code' => 403];
+                    if ($note->getNotebook()->getPrivate() === true && $user !== $note->getNotebook()->getUser()) {
+                        return ['success' => false, 'code' => 403];
                     }
 
                     //end of validating answer
@@ -98,7 +104,13 @@ class AnswerManager
                     if ($answer->getCorrect() === true) {
                         return ['success' => true, 'correct' => true];
                     } else {
-                        return ['success' => true, 'correct' => false];
+                        $answers = [
+                            'id' => $note->getId(),
+                            'field' => $field,
+                            'answer' => $answerField
+                        ];
+                        $answers['sub_notes'] = $subNotes;
+                        return ['success' => true, 'correct' => false, 'answer' => $answers];
                     }
                 }
             }

@@ -238,4 +238,28 @@ class NotebookControllerTest extends WebTestCase
         $this->assertStatusCode(200, $client);
         $this->assertFalse($data['success']);
     }
+
+    public function testGetNotebookQuestionActionSuccess()
+    {
+        $client = $this->createAuthenticatedClient();
+        /** @var Notebook $notebook */
+        $notebook = $this->getFixtureNotebook();
+
+        $client->request('GET', sprintf('/notebooks/%s/question', $notebook->getId()));
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertStatusCode(200, $client);
+        $this->assertTrue($data['success']);
+    }
+
+    public function testGetNotebookQuestionActionFailure()
+    {
+        $client = $this->createAuthenticatedClient();
+
+        $client->request('GET', sprintf('/notebooks/%s/question', 'wrong_id'));
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertStatusCode(200, $client);
+        $this->assertFalse($data['success']);
+    }
 }

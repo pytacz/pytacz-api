@@ -2,6 +2,7 @@
 
 namespace ApiBundle\Notes\QA;
 
+use ApiBundle\Entity\Note;
 use ApiBundle\Entity\Notebook;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
@@ -29,7 +30,7 @@ class QuestionManager
      * Get question
      *
      * @param Request   $request
-     * @param int       $id
+     * @param string    $id
      *
      * @return array
      */
@@ -74,7 +75,6 @@ class QuestionManager
 
                 return ['success' => true, 'result' => $result[$pick]];
             }
-            return ['success' => false];
         }
         return ['success' => false];
     }

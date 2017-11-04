@@ -100,14 +100,14 @@ class NotebookRepository extends \Doctrine\ORM\EntityRepository
         } else {
             $sqlData = 'SELECT n.name';
         }
-        $sql = $sqlData . ', n.id, COUNT(a.id) as counter
+        $sql = $sqlData . ", n.id, COUNT(a.id) as counter
             FROM notes n
-            LEFT JOIN answers a ON a.id_note = n.id AND a.correct = false AND a.id_user = :user
+            LEFT JOIN answers a ON a.id_note = n.id AND a.correct = 'false' AND a.id_user = :user
             WHERE n.id_notebook = :notebook
             GROUP BY n.id
             ORDER BY counter ASC, random()
             LIMIT :limit
-        ';
+        ";
         $stmt = $conn->prepare($sql);
         $stmt->execute(['user' => $user->getId(), 'notebook' => $notebook->getId(), 'limit' => $limit]);
 
@@ -124,14 +124,14 @@ class NotebookRepository extends \Doctrine\ORM\EntityRepository
         } else {
             $sqlData = 'SELECT n.name';
         }
-        $sql = $sqlData . ', n.id
+        $sql = $sqlData . ", n.id
             FROM notes n
-            JOIN answers a ON a.id_note = n.id AND a.correct = true AND a.id_user = :user
+            JOIN answers a ON a.id_note = n.id AND a.correct = 'true' AND a.id_user = :user
             WHERE n.id_notebook = :notebook
             GROUP BY n.id
             ORDER BY random()
             LIMIT :limit
-        ';
+        ";
         $stmt = $conn->prepare($sql);
         $stmt->execute(['user' => $user->getId(), 'notebook' => $notebook->getId(), 'limit' => $limit]);
 
@@ -148,14 +148,14 @@ class NotebookRepository extends \Doctrine\ORM\EntityRepository
         } else {
             $sqlData = 'SELECT n.name';
         }
-        $sql = $sqlData . ', n.id
+        $sql = $sqlData . ", n.id
             FROM notes n
-            JOIN answers a ON a.id_note = n.id AND a.correct = false AND a.id_user = :user
+            JOIN answers a ON a.id_note = n.id AND a.correct = 'false' AND a.id_user = :user
             WHERE n.id_notebook = :notebook
             GROUP BY n.id
             ORDER BY random()
             LIMIT 1
-        ';
+        ";
         $stmt = $conn->prepare($sql);
         $stmt->execute(['user' => $user->getId(), 'notebook' => $notebook->getId()]);
 
