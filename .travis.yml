@@ -5,7 +5,7 @@ sudo: false
 env:
   global:
     - setup=basic
-    - APP_ENV=staging
+    - APP_ENV=test
     - APP_DEBUG=true
     - APP_KEY=xxxx
     - DB_CONNECTION=sqlite
