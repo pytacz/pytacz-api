@@ -81,37 +81,37 @@ class AnswerManager
                             return ['success' => false];
                         }
                     }
+                }
 
-                    $user = $this->tokenStorage->getToken()->getUser();
-                    if ($note->getNotebook()->getPrivate() === true && $user !== $note->getNotebook()->getUser()) {
-                        return ['success' => false, 'code' => 403];
-                    }
+                $user = $this->tokenStorage->getToken()->getUser();
+                if ($note->getNotebook()->getPrivate() === true && $user !== $note->getNotebook()->getUser()) {
+                    return ['success' => false, 'code' => 403];
+                }
 
-                    //end of validating answer
-                    $isCorrect = $answer->getCorrect();
-                    if (!isset($isCorrect)) {
-                        $answer->setCorrect(true);
-                    }
-                    $answer
-                        ->setNote($note)
-                        ->setUser($user);
-                    $this->em->persist($answer);
-                    $this->em->flush();
+                //end of validating answer
+                $isCorrect = $answer->getCorrect();
+                if (!isset($isCorrect)) {
+                    $answer->setCorrect(true);
+                }
+                $this->em->getRepository('ApiBundle:Answer')
+                    ->deleteAnswers($user, $note);
+                $answer
+                    ->setNote($note)
+                    ->setUser($user);
+                $this->em->persist($answer);
+                $this->em->flush();
+                
+                $answers = [
+                    'id' => $note->getId(),
+                    'field' => $field,
+                    'answer' => $answerField
+                ];
+                $answers['sub_notes'] = $subNotes;
 
-                    $this->em->getRepository('ApiBundle:Answer')
-                        ->deleteWrongAnswers($user, $note);
-
-                    if ($answer->getCorrect() === true) {
-                        return ['success' => true, 'correct' => true];
-                    } else {
-                        $answers = [
-                            'id' => $note->getId(),
-                            'field' => $field,
-                            'answer' => $answerField
-                        ];
-                        $answers['sub_notes'] = $subNotes;
-                        return ['success' => true, 'correct' => false, 'answer' => $answers];
-                    }
+                if ($answer->getCorrect() === true) {
+                    return ['success' => true, 'correct' => true, 'answer' => $answers];
+                } else {
+                    return ['success' => true, 'correct' => false, 'answer' => $answers];
                 }
             }
             return ['success' => false];

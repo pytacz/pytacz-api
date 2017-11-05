@@ -13,12 +13,12 @@ use ApiBundle\Entity\User;
  */
 class AnswerRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function deleteWrongAnswers(User $user, Note $note)
+    public function deleteAnswers(User $user, Note $note)
     {
         $query = $this->getEntityManager()
             ->createQuery(
                 'DELETE FROM ApiBundle:Answer a
-            WHERE a.note = :note AND a.user = :user AND a.correct = false')
+            WHERE a.note = :note AND a.user = :user')
             ->setParameters([
                 'note' => $note,
                 'user' => $user
