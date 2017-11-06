@@ -49,7 +49,7 @@ class RefreshToken
 
                 $token = $this->jwtEncoder->encode([
                     'roles' => $payload['roles'],
-                    'username' => $payload['username']
+                    'email' => $payload['email']
                 ]);
 
                 return $token;

@@ -5,7 +5,7 @@ security:
     # https://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
     providers:
         users:
-            entity: { class: ApiBundle\Entity\User, property: username }
+            entity: { class: ApiBundle\Entity\User, property: email }
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
@@ -19,6 +19,7 @@ security:
             anonymous: true
             form_login:
                 check_path:               /auth/login
+                username_parameter:       _email
                 success_handler:          lexik_jwt_authentication.handler.authentication_success
                 failure_handler:          lexik_jwt_authentication.handler.authentication_failure
                 require_previous_session: false
